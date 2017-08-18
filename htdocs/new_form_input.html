@@ -1,0 +1,4098 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />  
+<title>新增巡检表录入</title>
+<script>
+function f2_leak_ac_close()
+{
+	document.getElementById("f2_leak_ac_spot").value=null
+}
+function f2_leak_corridor_close()
+{
+	document.getElementById("f2_leak_corridor_spot").value=null
+}
+function b1_leak_ac_close()
+{
+	document.getElementById("b1_leak_ac_spot").value=null
+}
+function qxl_leak_45m_close()
+{
+	document.getElementById("qxl_leak_45m_spot").value=null
+}
+function qxl_leak_15m_close()
+{
+	document.getElementById("qxl_leak_15m_spot").value=null
+}
+
+function getCookie(cookie_name) //该函数用来返回特定的Cookie
+{
+    var allcookies = document.cookie;
+    var cookie_pos = allcookies.indexOf(cookie_name);   //索引的长度
+  
+    // 如果找到了索引，就代表cookie存在，
+    // 反之，就说明不存在。
+    if (cookie_pos != -1)
+    {
+        // 把cookie_pos放在值的开始，只要给值加1即可。
+        cookie_pos += cookie_name.length + 1;      //这里容易出问题，所以请大家参考的时候自己好好研究一下
+        var cookie_end = allcookies.indexOf(";",cookie_pos);
+  
+        if (cookie_end == -1)
+        {
+            cookie_end = allcookies.length;
+        }
+  
+        var value = allcookies.substring(cookie_pos, cookie_end);         //这里就可以得到你想要的cookie的值了。。。
+    }
+    return value;
+}
+function delCookie(name)
+{
+	var exp = new Date();
+	exp.setTime(exp.getTime() - 1);
+	var cval=getCookie(name);
+	if(cval!=null)
+	document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+}
+function show_form_info() //显示formname巡检表的所有信息
+{	
+	if (getCookie("username")==null)
+	{
+		alert("未登陆，请重新登录");
+		window.location.href='../index.html';
+		return;
+	}
+	else if (getCookie("formname")==null)
+	{
+		alert("未选择表单，请重新选择")
+		window.location.href='../console_panel.html';
+		return;
+	}
+	
+
+	//定义POST的字符串变量，发送cookie的formname的值用于查询该巡检表的数据
+	var postStr="formname="+getCookie("formname");
+	
+	//开始初始化XMLHttpRequest对象
+	var xmlHttp;
+	try
+	{
+		//Firefox,Opera 8.0+ safari
+		xmlHttp = new XMLHttpRequest();
+	}
+	
+	catch(e)
+	{
+		//Inter Expplorer
+		try
+		{
+			xmlHttp = new ActiveXObject("Msxm12.XMLHTTP");
+		}
+		
+		catch(e)
+		{
+			try 
+			{
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			catch(e) 
+			{
+				alert("Your browser does not support AJAX!");
+				return false;
+			}
+		}
+	}
+	
+	//通过Post方式打开连接，将想要查询的巡检表名formname POST到/cgi-bin/form_query_export.py
+	xmlHttp.open("POST","/cgi-bin/form_query_export.py",true);
+	
+	//定义传输的文件HTTP头信息
+	xmlHttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	
+	//发送POST数据
+	xmlHttp.send(postStr);
+	
+	//获取执行状态
+	xmlHttp.onreadystatechange = function()
+	{
+		if(xmlHttp.readyState == 4 && xmlHttp.status == 200) //如果执行状态成功，那么就把返回的数据赋值到变量，form_query_export.py返回的数据是JSON对象
+		{	
+			//通过xmlHttp.responseText方法获得python cgi返回的值（JSON对象），并使用JSON.parse解析JSON对象，可通过JSON.parse[index][index]的方式调用值。
+			var data_text=JSON.parse(xmlHttp.responseText);
+			
+			//显示表头数据
+			document.getElementById("formname").innerHTML=data_text[0][0];
+			document.getElementById("recorder_truthname").innerHTML=data_text[0][2];
+			document.getElementById("form_create_date_time").innerHTML=data_text[0][546];
+			
+			//显示2楼温湿度数据
+			document.getElementById("f2_tem1").value=data_text[0][8];
+			document.getElementById("f2_hum1").value=data_text[0][9];
+			document.getElementById("f2_tem2").value=data_text[0][10];
+			document.getElementById("f2_hum2").value=data_text[0][11];
+			document.getElementById("f2_tem3").value=data_text[0][12];
+			document.getElementById("f2_hum3").value=data_text[0][13];
+			document.getElementById("f2_tem4").value=data_text[0][14];
+			document.getElementById("f2_hum4").value=data_text[0][15];
+			document.getElementById("f2_tem5").value=data_text[0][16];
+			document.getElementById("f2_hum5").value=data_text[0][17];
+			document.getElementById("f2_tem6").value=data_text[0][18];
+			document.getElementById("f2_hum6").value=data_text[0][19];
+			document.getElementById("f2_tem7").value=data_text[0][20];
+			document.getElementById("f2_hum7").value=data_text[0][21];
+			document.getElementById("f2_tem8").value=data_text[0][22];
+			document.getElementById("f2_hum8").value=data_text[0][23];
+			document.getElementById("f2_tem9").value=data_text[0][24];
+			document.getElementById("f2_hum9").value=data_text[0][25];
+			document.getElementById("f2_tem10").value=data_text[0][26];
+			document.getElementById("f2_hum10").value=data_text[0][27];
+			document.getElementById("f2_tem11").value=data_text[0][28];
+			document.getElementById("f2_hum11").value=data_text[0][29];
+			document.getElementById("f2_tem12").value=data_text[0][30];
+			document.getElementById("f2_hum12").value=data_text[0][31];
+			document.getElementById("f2_tem13").value=data_text[0][32];
+			document.getElementById("f2_hum13").value=data_text[0][33];
+			document.getElementById("f2_tem14").value=data_text[0][34];
+			document.getElementById("f2_hum14").value=data_text[0][35];
+			document.getElementById("f2_tem15").value=data_text[0][36];
+			document.getElementById("f2_hum15").value=data_text[0][37];
+			document.getElementById("f2_tem16").value=data_text[0][38];
+			document.getElementById("f2_hum16").value=data_text[0][39];
+			document.getElementById("f2_tem17").value=data_text[0][40];
+			document.getElementById("f2_hum17").value=data_text[0][41];
+			document.getElementById("f2_tem18").value=data_text[0][42];
+			document.getElementById("f2_hum18").value=data_text[0][43];
+			document.getElementById("f2_tem19").value=data_text[0][44];
+			document.getElementById("f2_hum19").value=data_text[0][45];
+			document.getElementById("f2_tem20").value=data_text[0][46];
+			document.getElementById("f2_hum20").value=data_text[0][47];
+			document.getElementById("f2_tem21").value=data_text[0][48];
+			document.getElementById("f2_hum21").value=data_text[0][49];
+			document.getElementById("f2_tem22").value=data_text[0][50];
+			document.getElementById("f2_hum22").value=data_text[0][51];
+			document.getElementById("f2_tem23").value=data_text[0][52];
+			document.getElementById("f2_hum23").value=data_text[0][53];
+			document.getElementById("f2_tem24").value=data_text[0][54];
+			document.getElementById("f2_hum24").value=data_text[0][55];
+			document.getElementById("f2_tem25").value=data_text[0][56];
+			document.getElementById("f2_hum25").value=data_text[0][57];
+			document.getElementById("f2_tem26").value=data_text[0][58];
+			document.getElementById("f2_hum26").value=data_text[0][59];
+			document.getElementById("f2_tem27").value=data_text[0][60];
+			document.getElementById("f2_hum27").value=data_text[0][61];
+			document.getElementById("f2_tem28").value=data_text[0][62];
+			document.getElementById("f2_hum28").value=data_text[0][63];
+			document.getElementById("f2_tem29").value=data_text[0][64];
+			document.getElementById("f2_hum29").value=data_text[0][65];
+			document.getElementById("f2_tem30").value=data_text[0][66];
+			document.getElementById("f2_hum30").value=data_text[0][67];
+			document.getElementById("f2_tem31").value=data_text[0][68];
+			document.getElementById("f2_hum31").value=data_text[0][69];
+			document.getElementById("f2_temandhum_des").value=data_text[0][70];
+			
+			//显示2楼机房精密空调数据
+			document.getElementById("ac_tem1").value=data_text[0][71];
+			document.getElementById("ac_hum1").value=data_text[0][72];
+			document.getElementById("ac_open1").value=data_text[0][73];
+			document.getElementById("ac_state1").value=data_text[0][74];
+			document.getElementById("ac_voice1").value=data_text[0][75];
+			document.getElementById("ac_tem2").value=data_text[0][76];
+			document.getElementById("ac_hum2").value=data_text[0][77];
+			document.getElementById("ac_open2").value=data_text[0][78];
+			document.getElementById("ac_state2").value=data_text[0][79];
+			document.getElementById("ac_voice2").value=data_text[0][80];
+			document.getElementById("ac_tem3").value=data_text[0][81];
+			document.getElementById("ac_hum3").value=data_text[0][82];
+			document.getElementById("ac_open3").value=data_text[0][83];
+			document.getElementById("ac_state3").value=data_text[0][84];
+			document.getElementById("ac_voice3").value=data_text[0][85];
+			document.getElementById("ac_tem4").value=data_text[0][86];
+			document.getElementById("ac_hum4").value=data_text[0][87];
+			document.getElementById("ac_open4").value=data_text[0][88];
+			document.getElementById("ac_state4").value=data_text[0][89];
+			document.getElementById("ac_voice4").value=data_text[0][90];
+			document.getElementById("ac_tem5").value=data_text[0][91];
+			document.getElementById("ac_hum5").value=data_text[0][92];
+			document.getElementById("ac_open5").value=data_text[0][93];
+			document.getElementById("ac_state5").value=data_text[0][94];
+			document.getElementById("ac_voice5").value=data_text[0][95];
+			document.getElementById("ac_tem6").value=data_text[0][96];
+			document.getElementById("ac_hum6").value=data_text[0][97];
+			document.getElementById("ac_open6").value=data_text[0][98];
+			document.getElementById("ac_state6").value=data_text[0][99];
+			document.getElementById("ac_voice6").value=data_text[0][100];
+			document.getElementById("ac_tem7").value=data_text[0][101];
+			document.getElementById("ac_hum7").value=data_text[0][102];
+			document.getElementById("ac_open7").value=data_text[0][103];
+			document.getElementById("ac_state7").value=data_text[0][104];
+			document.getElementById("ac_voice7").value=data_text[0][105];
+			document.getElementById("ac_tem8").value=data_text[0][106];
+			document.getElementById("ac_hum8").value=data_text[0][107];
+			document.getElementById("ac_open8").value=data_text[0][108];
+			document.getElementById("ac_state8").value=data_text[0][109];
+			document.getElementById("ac_voice8").value=data_text[0][110];
+			document.getElementById("ac_tem9").value=data_text[0][111];
+			document.getElementById("ac_hum9").value=data_text[0][112];
+			document.getElementById("ac_open9").value=data_text[0][113];
+			document.getElementById("ac_state9").value=data_text[0][114];
+			document.getElementById("ac_voice9").value=data_text[0][115];
+			document.getElementById("ac_tem10").value=data_text[0][116];
+			document.getElementById("ac_hum10").value=data_text[0][117];
+			document.getElementById("ac_open10").value=data_text[0][118];
+			document.getElementById("ac_state10").value=data_text[0][119];
+			document.getElementById("ac_voice10").value=data_text[0][120];
+			document.getElementById("ac_tem11").value=data_text[0][121];
+			document.getElementById("ac_hum11").value=data_text[0][122];
+			document.getElementById("ac_open11").value=data_text[0][123];
+			document.getElementById("ac_state11").value=data_text[0][124];
+			document.getElementById("ac_voice11").value=data_text[0][125];
+			document.getElementById("ac_tem12").value=data_text[0][126];
+			document.getElementById("ac_hum12").value=data_text[0][127];
+			document.getElementById("ac_open12").value=data_text[0][128];
+			document.getElementById("ac_state12").value=data_text[0][129];
+			document.getElementById("ac_voice12").value=data_text[0][130];
+			document.getElementById("ac_tem13").value=data_text[0][131];
+			document.getElementById("ac_hum13").value=data_text[0][132];
+			document.getElementById("ac_open13").value=data_text[0][133];
+			document.getElementById("ac_state13").value=data_text[0][134];
+			document.getElementById("ac_voice13").value=data_text[0][135];
+			document.getElementById("f2_aircondition_des").value=data_text[0][136];
+			document.getElementById("P1101A_state").value=data_text[0][137];
+			
+			//显示2楼机房强电列头柜数据
+			document.getElementById("P1101A_voltage").value=data_text[0][138];
+			document.getElementById("P1101A_ia").value=data_text[0][139];
+			document.getElementById("P1101A_ib").value=data_text[0][140];
+			document.getElementById("P1101A_ic").value=data_text[0][141];
+			document.getElementById("P1101B_state").value=data_text[0][142];
+			document.getElementById("P1101B_voltage").value=data_text[0][143];
+			document.getElementById("P1101B_ia").value=data_text[0][144];
+			document.getElementById("P1101B_ib").value=data_text[0][145];
+			document.getElementById("P1101B_ic").value=data_text[0][146];
+			document.getElementById("P1001A_state").value=data_text[0][147];
+			document.getElementById("P1001A_voltage").value=data_text[0][148];
+			document.getElementById("P1001A_ia").value=data_text[0][149];
+			document.getElementById("P1001A_ib").value=data_text[0][150];
+			document.getElementById("P1001A_ic").value=data_text[0][151];
+			document.getElementById("P1001B_state").value=data_text[0][152];
+			document.getElementById("P1001B_voltage").value=data_text[0][153];
+			document.getElementById("P1001B_ia").value=data_text[0][154];
+			document.getElementById("P1001B_ib").value=data_text[0][155];
+			document.getElementById("P1001B_ic").value=data_text[0][156];
+			document.getElementById("P0901A_state").value=data_text[0][157];
+			document.getElementById("P0901A_voltage").value=data_text[0][158];
+			document.getElementById("P0901A_ia").value=data_text[0][159];
+			document.getElementById("P0901A_ib").value=data_text[0][160];
+			document.getElementById("P0901A_ic").value=data_text[0][161];
+			document.getElementById("P0901B_state").value=data_text[0][162];
+			document.getElementById("P0901B_voltage").value=data_text[0][163];
+			document.getElementById("P0901B_ia").value=data_text[0][164];
+			document.getElementById("P0901B_ib").value=data_text[0][165];
+			document.getElementById("P0901B_ic").value=data_text[0][166];
+			document.getElementById("P0801A_state").value=data_text[0][167];
+			document.getElementById("P0801A_voltage").value=data_text[0][168];
+			document.getElementById("P0801A_ia").value=data_text[0][169];
+			document.getElementById("P0801A_ib").value=data_text[0][170];
+			document.getElementById("P0801A_ic").value=data_text[0][171];
+			document.getElementById("P0801B_state").value=data_text[0][172];
+			document.getElementById("P0801B_voltage").value=data_text[0][173];
+			document.getElementById("P0801B_ia").value=data_text[0][174];
+			document.getElementById("P0801B_ib").value=data_text[0][175];
+			document.getElementById("P0801B_ic").value=data_text[0][176];
+			document.getElementById("P0701A_state").value=data_text[0][177];
+			document.getElementById("P0701A_voltage").value=data_text[0][178];
+			document.getElementById("P0701A_ia").value=data_text[0][179];
+			document.getElementById("P0701A_ib").value=data_text[0][180];
+			document.getElementById("P0701A_ic").value=data_text[0][181];
+			document.getElementById("P0701B_state").value=data_text[0][182];
+			document.getElementById("P0701B_voltage").value=data_text[0][183];
+			document.getElementById("P0701B_ia").value=data_text[0][184];
+			document.getElementById("P0701B_ib").value=data_text[0][185];
+			document.getElementById("P0701B_ic").value=data_text[0][186];
+			document.getElementById("P0601A_state").value=data_text[0][187];
+			document.getElementById("P0601A_voltage").value=data_text[0][188];
+			document.getElementById("P0601A_ia").value=data_text[0][189];
+			document.getElementById("P0601A_ib").value=data_text[0][190];
+			document.getElementById("P0601A_ic").value=data_text[0][191];
+			document.getElementById("P0601B_state").value=data_text[0][192];
+			document.getElementById("P0601B_voltage").value=data_text[0][193];
+			document.getElementById("P0601B_ia").value=data_text[0][194];
+			document.getElementById("P0601B_ib").value=data_text[0][195];
+			document.getElementById("P0601B_ic").value=data_text[0][196];
+			document.getElementById("P0501A_state").value=data_text[0][197];
+			document.getElementById("P0501A_voltage").value=data_text[0][198];
+			document.getElementById("P0501A_ia").value=data_text[0][199];
+			document.getElementById("P0501A_ib").value=data_text[0][200];
+			document.getElementById("P0501A_ic").value=data_text[0][201];
+			document.getElementById("P0501B_state").value=data_text[0][202];
+			document.getElementById("P0501B_voltage").value=data_text[0][203];
+			document.getElementById("P0501B_ia").value=data_text[0][204];
+			document.getElementById("P0501B_ib").value=data_text[0][205];
+			document.getElementById("P0501B_ic").value=data_text[0][206];
+			document.getElementById("P0401A_state").value=data_text[0][207];
+			document.getElementById("P0401A_voltage").value=data_text[0][208];
+			document.getElementById("P0401A_ia").value=data_text[0][209];
+			document.getElementById("P0401A_ib").value=data_text[0][210];
+			document.getElementById("P0401A_ic").value=data_text[0][211];
+			document.getElementById("P0401B_state").value=data_text[0][212];
+			document.getElementById("P0401B_voltage").value=data_text[0][213];
+			document.getElementById("P0401B_ia").value=data_text[0][214];
+			document.getElementById("P0401B_ib").value=data_text[0][215];
+			document.getElementById("P0401B_ic").value=data_text[0][216];
+			document.getElementById("P0301A_state").value=data_text[0][217];
+			document.getElementById("P0301A_voltage").value=data_text[0][218];
+			document.getElementById("P0301A_ia").value=data_text[0][219];
+			document.getElementById("P0301A_ib").value=data_text[0][220];
+			document.getElementById("P0301A_ic").value=data_text[0][221];
+			document.getElementById("P0301B_state").value=data_text[0][222];
+			document.getElementById("P0301B_voltage").value=data_text[0][223];
+			document.getElementById("P0301B_ia").value=data_text[0][224];
+			document.getElementById("P0301B_ib").value=data_text[0][225];
+			document.getElementById("P0301B_ic").value=data_text[0][226];
+			document.getElementById("P0101A_state").value=data_text[0][227];
+			document.getElementById("P0101A_voltage").value=data_text[0][228];
+			document.getElementById("P0101A_ia").value=data_text[0][229];
+			document.getElementById("P0101A_ib").value=data_text[0][230];
+			document.getElementById("P0101A_ic").value=data_text[0][231];
+			document.getElementById("P0101B_state").value=data_text[0][232];
+			document.getElementById("P0101B_voltage").value=data_text[0][233];
+			document.getElementById("P0101B_ia").value=data_text[0][234];
+			document.getElementById("P0101B_ib").value=data_text[0][235];
+			document.getElementById("P0101B_ic").value=data_text[0][236];
+			document.getElementById("f2_pmm_des").value=data_text[0][237];
+			
+			//显示2楼机房环境数据
+			document.getElementById("f2_fire_host").value=data_text[0][238];
+			document.getElementById("f2_fire_bottle").value=data_text[0][239];
+			document.getElementById("f2_fire_sensor").value=data_text[0][240];
+			document.getElementById("f2_fire_access").value=data_text[0][241];
+			document.getElementById("f2_fire_sign").value=data_text[0][242];
+			document.getElementById("f2_fire_alarm").value=data_text[0][243];
+			document.getElementById("f2_jxc_state").value=data_text[0][244];
+			document.getElementById("f2_jxc_open").value=data_text[0][245];
+			if (data_text[0][246]=="0") //如果2楼空调漏水绳状态为"0"，Radio组件f2_leak_ac勾选正常f2_leak_ac_1
+			{
+				document.getElementById("f2_leak_ac_1").checked="checked";
+			}
+			else //如果2楼空调漏水绳状态不为"0"（为"1"），Radio组件f2_leak_ac勾选漏水f2_leak_ac_2
+			{
+				document.getElementById("f2_leak_ac_2").checked="checked";
+			}
+			
+			document.getElementById("f2_leak_ac_spot").value=data_text[0][247];
+			
+			if (data_text[0][248]=="0") //如果2楼走廊漏水绳状态为"0"，Radio组件f2_leak_corridor勾选正常f2_leak_corridor_1
+			{
+				document.getElementById("f2_leak_corridor_1").checked="checked";
+			}
+			else //如果2楼走廊漏水绳状态不为"0"（为"1"），Radio组件f2_leak_corridor勾选正常f2_leak_corridor_2
+			{
+				document.getElementById("f2_leak_corridor_2").checked="checked";
+			}
+			
+			document.getElementById("f2_leak_corridor_spot").value=data_text[0][249];
+			document.getElementById("screen_state").value=data_text[0][250];
+			document.getElementById("observer_state").value=data_text[0][251];
+			document.getElementById("f2_defend_state").value=data_text[0][252];
+			document.getElementById("f2_trace_state").value=data_text[0][253];
+			document.getElementById("monitorroom_door").value=data_text[0][254];
+			document.getElementById("testroom_door").value=data_text[0][255];
+			document.getElementById("gate_door").value=data_text[0][256];
+			document.getElementById("bottleroom_door").value=data_text[0][257];
+			document.getElementById("floor_door").value=data_text[0][258];
+			document.getElementById("glass_door1").value=data_text[0][259];
+			document.getElementById("glass_door2").value=data_text[0][260];
+			document.getElementById("glass_door3").value=data_text[0][261];
+			document.getElementById("glass_door4").value=data_text[0][262];
+			document.getElementById("rack_door").value=data_text[0][263];
+			document.getElementById("f2_environment_des").value=data_text[0][264];
+			
+			//显示负1楼机房温湿度数据
+			document.getElementById("b1_tem21").value=data_text[0][265];
+			document.getElementById("b1_hum21").value=data_text[0][266];
+			document.getElementById("b1_tem22").value=data_text[0][267];
+			document.getElementById("b1_hum22").value=data_text[0][268];
+			document.getElementById("b1_tem23").value=data_text[0][269];
+			document.getElementById("b1_hum23").value=data_text[0][270];
+			document.getElementById("b1_tem24").value=data_text[0][271];
+			document.getElementById("b1_hum24").value=data_text[0][272];
+			document.getElementById("b1_tem25").value=data_text[0][273];
+			document.getElementById("b1_hum25").value=data_text[0][274];
+			document.getElementById("b1_tem26").value=data_text[0][275];
+			document.getElementById("b1_hum26").value=data_text[0][276];
+			document.getElementById("b1_tem27").value=data_text[0][277];
+			document.getElementById("b1_hum27").value=data_text[0][278];
+			document.getElementById("b1_tem28").value=data_text[0][279];
+			document.getElementById("b1_hum28").value=data_text[0][280];
+			document.getElementById("b1_tem29").value=data_text[0][281];
+			document.getElementById("b1_hum29").value=data_text[0][282];
+			document.getElementById("b1_temandhum_des").value=data_text[0][283];
+			
+			//显示负1楼机房精密空调数据
+			document.getElementById("ac_tem14").value=data_text[0][284];
+			document.getElementById("ac_hum14").value=data_text[0][285];
+			document.getElementById("ac_open14").value=data_text[0][286];
+			document.getElementById("ac_state14").value=data_text[0][287];
+			document.getElementById("ac_voice14").value=data_text[0][288];
+			document.getElementById("ac_tem15").value=data_text[0][289];
+			document.getElementById("ac_hum15").value=data_text[0][290];
+			document.getElementById("ac_open15").value=data_text[0][291];
+			document.getElementById("ac_state15").value=data_text[0][292];
+			document.getElementById("ac_voice15").value=data_text[0][293];
+			document.getElementById("ac_tem16").value=data_text[0][294];
+			document.getElementById("ac_hum16").value=data_text[0][295];
+			document.getElementById("ac_open16").value=data_text[0][296];
+			document.getElementById("ac_state16").value=data_text[0][297];
+			document.getElementById("ac_voice16").value=data_text[0][298];
+			document.getElementById("ac_tem17").value=data_text[0][299];
+			document.getElementById("ac_hum17").value=data_text[0][300];
+			document.getElementById("ac_open17").value=data_text[0][301];
+			document.getElementById("ac_state17").value=data_text[0][302];
+			document.getElementById("ac_voice17").value=data_text[0][303];
+			document.getElementById("b1_aircondition_des").value=data_text[0][304];
+			
+			//显示负1楼环境数据
+			if (data_text[0][305]=="0") //如果负1楼空调漏水绳状态为"0"，Radio组件b1_leak_ac勾选正常b1_leak_ac_1
+			{
+				document.getElementById("b1_leak_ac_1").checked="checked";
+			}
+			else //如果2楼空调漏水绳状态不为"0"（为"1"），Radio组件b1_leak_ac勾选漏水b1_leak_ac_2
+			{
+				document.getElementById("b1_leak_ac_2").checked="checked";
+			}
+			document.getElementById("b1_leak_ac_spot").value=data_text[0][306];
+			document.getElementById("b1_leak_well").value=data_text[0][307];
+			document.getElementById("b1_jxc_state").value=data_text[0][308];
+			document.getElementById("b1_jxc_open").value=data_text[0][309];
+			document.getElementById("b1_fire_state").value=data_text[0][310];
+			document.getElementById("b1_smell_state").value=data_text[0][311];
+			document.getElementById("b1_defend_state").value=data_text[0][312];
+			document.getElementById("b1_trace_state").value=data_text[0][313];
+			document.getElementById("b1_left_door").value=data_text[0][314];
+			document.getElementById("b1_right_door").value=data_text[0][315];
+			document.getElementById("b1_environment_des").value=data_text[0][316];
+			
+			//显示负1楼UPS数据
+			document.getElementById("UPSA1_power_l1").value=data_text[0][317];
+			document.getElementById("UPSA1_power_l2").value=data_text[0][318];
+			document.getElementById("UPSA1_power_l3").value=data_text[0][319];
+			document.getElementById("UPSA1_battery_voltage").value=data_text[0][320];
+			document.getElementById("UPSA1_FCNC").value=data_text[0][321];
+			document.getElementById("UPSA1_usage").value=data_text[0][322];
+			document.getElementById("UPSA1_alert_state").value=data_text[0][323];
+			document.getElementById("UPSA1_battery_state").value=data_text[0][324];
+			document.getElementById("UPSA2_power_l1").value=data_text[0][325];
+			document.getElementById("UPSA2_power_l2").value=data_text[0][326];
+			document.getElementById("UPSA2_power_l3").value=data_text[0][327];
+			document.getElementById("UPSA2_battery_voltage").value=data_text[0][328];
+			document.getElementById("UPSA2_FCNC").value=data_text[0][329];
+			document.getElementById("UPSA2_usage").value=data_text[0][330];
+			document.getElementById("UPSA2_alert_state").value=data_text[0][331];
+			document.getElementById("UPSA2_battery_state").value=data_text[0][332];
+			document.getElementById("UPSB1_power_l1").value=data_text[0][333];
+			document.getElementById("UPSB1_power_l2").value=data_text[0][334];
+			document.getElementById("UPSB1_power_l3").value=data_text[0][335];
+			document.getElementById("UPSB1_battery_voltage").value=data_text[0][336];
+			document.getElementById("UPSB1_FCNC").value=data_text[0][337];
+			document.getElementById("UPSB1_usage").value=data_text[0][338];
+			document.getElementById("UPSB1_alert_state").value=data_text[0][339];
+			document.getElementById("UPSB1_battery_state").value=data_text[0][340];
+			document.getElementById("UPSB2_power_l1").value=data_text[0][341];
+			document.getElementById("UPSB2_power_l2").value=data_text[0][342];
+			document.getElementById("UPSB2_power_l3").value=data_text[0][343];
+			document.getElementById("UPSB2_battery_voltage").value=data_text[0][344];
+			document.getElementById("UPSB2_FCNC").value=data_text[0][345];
+			document.getElementById("UPSB2_usage").value=data_text[0][346];
+			document.getElementById("UPSB2_alert_state").value=data_text[0][347];
+			document.getElementById("UPSB2_battery_state").value=data_text[0][348];
+			document.getElementById("b1_UPS_des").value=data_text[0][349];
+
+			//显示负1楼低压配电柜数据
+			document.getElementById("cabinet9_uab").value=data_text[0][350];
+			document.getElementById("cabinet9_ubc").value=data_text[0][351];
+			document.getElementById("cabinet9_uca").value=data_text[0][352];
+			document.getElementById("cabinet9_ia").value=data_text[0][353];
+			document.getElementById("cabinet9_ib").value=data_text[0][354];
+			document.getElementById("cabinet9_ic").value=data_text[0][355];
+			document.getElementById("cabinet9_breaker_state").value=data_text[0][356];
+			document.getElementById("cabinet4_uab").value=data_text[0][357];
+			document.getElementById("cabinet4_ubc").value=data_text[0][358];
+			document.getElementById("cabinet4_uca").value=data_text[0][359];
+			document.getElementById("cabinet4_ia").value=data_text[0][360];
+			document.getElementById("cabinet4_ib").value=data_text[0][361];
+			document.getElementById("cabinet4_ic").value=data_text[0][362];
+			document.getElementById("cabinet4_breaker_state").value=data_text[0][363];
+			document.getElementById("cabinet7_uab").value=data_text[0][364];
+			document.getElementById("cabinet7_ubc").value=data_text[0][365];
+			document.getElementById("cabinet7_uca").value=data_text[0][366];
+			document.getElementById("cabinet7_ia").value=data_text[0][367];
+			document.getElementById("cabinet7_ib").value=data_text[0][368];
+			document.getElementById("cabinet7_ic").value=data_text[0][369];
+			document.getElementById("cabinet7_breaker_state").value=data_text[0][370];
+			document.getElementById("cabinet8_uab").value=data_text[0][371];
+			document.getElementById("cabinet8_ubc").value=data_text[0][372];
+			document.getElementById("cabinet8_uca").value=data_text[0][373];
+			document.getElementById("cabinet8_ia").value=data_text[0][374];
+			document.getElementById("cabinet8_ib").value=data_text[0][375];
+			document.getElementById("cabinet8_ic").value=data_text[0][376];
+			document.getElementById("cabinet8_breaker_state").value=data_text[0][377];
+			document.getElementById("cabinet3_uab").value=data_text[0][378];
+			document.getElementById("cabinet3_ubc").value=data_text[0][379];
+			document.getElementById("cabinet3_uca").value=data_text[0][380];
+			document.getElementById("cabinet3_ia").value=data_text[0][381];
+			document.getElementById("cabinet3_ib").value=data_text[0][382];
+			document.getElementById("cabinet3_ic").value=data_text[0][383];
+			document.getElementById("cabinet3_breaker_state").value=data_text[0][384];
+			document.getElementById("cabinet6_uab").value=data_text[0][385];
+			document.getElementById("cabinet6_ubc").value=data_text[0][386];
+			document.getElementById("cabinet6_uca").value=data_text[0][387];
+			document.getElementById("cabinet6_ia").value=data_text[0][388];
+			document.getElementById("cabinet6_ib").value=data_text[0][389];
+			document.getElementById("cabinet6_ic").value=data_text[0][390];
+			document.getElementById("cabinet6_breaker_state").value=data_text[0][391];
+			document.getElementById("cabinet5_uab").value=data_text[0][392];
+			document.getElementById("cabinet5_ubc").value=data_text[0][393];
+			document.getElementById("cabinet5_uca").value=data_text[0][394];
+			document.getElementById("cabinet5_ia").value=data_text[0][395];
+			document.getElementById("cabinet5_ib").value=data_text[0][396];
+			document.getElementById("cabinet5_ic").value=data_text[0][397];
+			document.getElementById("cabinet5_breaker_state").value=data_text[0][398];
+			document.getElementById("cabinet2_uab").value=data_text[0][399];
+			document.getElementById("cabinet2_ubc").value=data_text[0][400];
+			document.getElementById("cabinet2_uca").value=data_text[0][401];
+			document.getElementById("cabinet2_ia").value=data_text[0][402];
+			document.getElementById("cabinet2_ib").value=data_text[0][403];
+			document.getElementById("cabinet2_ic").value=data_text[0][404];
+			document.getElementById("cabinet2_breaker_state").value=data_text[0][405];
+			document.getElementById("cabinet1_uab").value=data_text[0][406];
+			document.getElementById("cabinet1_ubc").value=data_text[0][407];
+			document.getElementById("cabinet1_uca").value=data_text[0][408];
+			document.getElementById("cabinet1_ia").value=data_text[0][409];
+			document.getElementById("cabinet1_ib").value=data_text[0][410];
+			document.getElementById("cabinet1_ic").value=data_text[0][411];
+			document.getElementById("cabinet1_breaker_state").value=data_text[0][412];
+			document.getElementById("b1_cabinet_des").value=data_text[0][413];
+			
+			//显示气象路机房温湿度数据
+			document.getElementById("qxl_tem1").value=data_text[0][414];
+			document.getElementById("qxl_hum1").value=data_text[0][415];
+			document.getElementById("qxl_tem2").value=data_text[0][416];
+			document.getElementById("qxl_hum2").value=data_text[0][417];
+			document.getElementById("qxl_tem3").value=data_text[0][418];
+			document.getElementById("qxl_hum3").value=data_text[0][419];
+			document.getElementById("qxl_tem4").value=data_text[0][420];
+			document.getElementById("qxl_hum4").value=data_text[0][421];
+			document.getElementById("qxl_tem5").value=data_text[0][422];
+			document.getElementById("qxl_hum5").value=data_text[0][423];
+			document.getElementById("qxl_tem6").value=data_text[0][424];
+			document.getElementById("qxl_hum6").value=data_text[0][425];
+			document.getElementById("qxl_tem7").value=data_text[0][426];
+			document.getElementById("qxl_hum7").value=data_text[0][427];
+			document.getElementById("qxl_tem8").value=data_text[0][428];
+			document.getElementById("qxl_hum8").value=data_text[0][429];
+			document.getElementById("qxl_tem9").value=data_text[0][430];
+			document.getElementById("qxl_hum9").value=data_text[0][431];
+			document.getElementById("qxl_tem10").value=data_text[0][432];
+			document.getElementById("qxl_hum10").value=data_text[0][433];
+			document.getElementById("qxl_temandhum_des").value=data_text[0][434];
+
+			//显示气象路机房精密空调数据
+			document.getElementById("qxl_ac_tem1").value=data_text[0][435];
+			document.getElementById("qxl_ac_hum1").value=data_text[0][436];
+			document.getElementById("qxl_ac_open1").value=data_text[0][437];
+			document.getElementById("qxl_ac_state1").value=data_text[0][438];
+			document.getElementById("qxl_ac_voice1").value=data_text[0][439];
+			document.getElementById("qxl_ac_tem2").value=data_text[0][440];
+			document.getElementById("qxl_ac_hum2").value=data_text[0][441];
+			document.getElementById("qxl_ac_open2").value=data_text[0][442];
+			document.getElementById("qxl_ac_state2").value=data_text[0][443];
+			document.getElementById("qxl_ac_voice2").value=data_text[0][444];
+			document.getElementById("qxl_aircondition_des").value=data_text[0][445];
+			
+			//显示气象路环境数据
+			if (data_text[0][446]=="0") //如果气象路45m漏水绳状态为"0"，Radio组件qxl_leak_45m勾选正常qxl_leak_45m_1
+			{
+				document.getElementById("qxl_leak_45m_1").checked="checked";
+			}
+			else //如果气象路45m漏水绳状态不为"0"（为"1"），Radio组件qxl_leak_45m勾选漏水qxl_leak_45m_2
+			{
+				document.getElementById("qxl_leak_45m_2").checked="checked";
+			}
+			
+			document.getElementById("qxl_leak_45m_spot").value=data_text[0][447];
+
+			if (data_text[0][448]=="0") //如果气象路15m漏水绳状态为"0"，Radio组件qxl_leak_15m勾选正常qxl_leak_15m_1
+			{
+				document.getElementById("qxl_leak_15m_1").checked="checked";
+			}
+			else //如果气象路15m漏水绳状态不为"0"（为"1"），Radio组件qxl_leak_15m勾选漏水qxl_leak_15m_2
+			{
+				document.getElementById("qxl_leak_15m_2").checked="checked";
+			}
+			
+			document.getElementById("qxl_leak_15m_spot").value=data_text[0][449];
+			document.getElementById("qxl_door1").value=data_text[0][450];
+			document.getElementById("qxl_door2").value=data_text[0][451];
+			document.getElementById("qxl_door3").value=data_text[0][452];
+			document.getElementById("qxl_door4").value=data_text[0][453];
+			document.getElementById("qxl_defend_state").value=data_text[0][454];
+			document.getElementById("qxl_environment_des").value=data_text[0][455];
+
+			//显示气象路精密配电柜PMM数据
+			document.getElementById("qxl_pmm1_uab").value=data_text[0][456];
+			document.getElementById("qxl_pmm1_ubc").value=data_text[0][457];
+			document.getElementById("qxl_pmm1_uca").value=data_text[0][458];
+			document.getElementById("qxl_pmm1_ia").value=data_text[0][459];
+			document.getElementById("qxl_pmm1_ib").value=data_text[0][460];
+			document.getElementById("qxl_pmm1_ic").value=data_text[0][461];
+			document.getElementById("qxl_pmm1_state").value=data_text[0][462];
+			document.getElementById("qxl_pmm2_uab").value=data_text[0][463];
+			document.getElementById("qxl_pmm2_ubc").value=data_text[0][464];
+			document.getElementById("qxl_pmm2_uca").value=data_text[0][465];
+			document.getElementById("qxl_pmm2_ia").value=data_text[0][466];
+			document.getElementById("qxl_pmm2_ib").value=data_text[0][467];
+			document.getElementById("qxl_pmm2_ic").value=data_text[0][468];
+			document.getElementById("qxl_pmm2_state").value=data_text[0][469];
+			document.getElementById("qxl_pmm_des").value=data_text[0][470];
+			
+			//显示气象路低压配电柜数据
+			document.getElementById("qxl_cabinet1_uab").value=data_text[0][471];
+			document.getElementById("qxl_cabinet1_ubc").value=data_text[0][472];
+			document.getElementById("qxl_cabinet1_uca").value=data_text[0][473];
+			document.getElementById("qxl_cabinet1_ia").value=data_text[0][474];
+			document.getElementById("qxl_cabinet1_ib").value=data_text[0][475];
+			document.getElementById("qxl_cabinet1_ic").value=data_text[0][476];
+			document.getElementById("qxl_cabinet1_breaker_state").value=data_text[0][477];
+			document.getElementById("qxl_cabinet2_uab").value=data_text[0][478];
+			document.getElementById("qxl_cabinet2_ubc").value=data_text[0][479];
+			document.getElementById("qxl_cabinet2_uca").value=data_text[0][480];
+			document.getElementById("qxl_cabinet2_ia").value=data_text[0][481];
+			document.getElementById("qxl_cabinet2_ib").value=data_text[0][482];
+			document.getElementById("qxl_cabinet2_ic").value=data_text[0][483];
+			document.getElementById("qxl_cabinet2_breaker_state").value=data_text[0][484];
+			document.getElementById("qxl_cabinet3_uab").value=data_text[0][485];
+			document.getElementById("qxl_cabinet3_ubc").value=data_text[0][486];
+			document.getElementById("qxl_cabinet3_uca").value=data_text[0][487];
+			document.getElementById("qxl_cabinet3_ia").value=data_text[0][488];
+			document.getElementById("qxl_cabinet3_ib").value=data_text[0][489];
+			document.getElementById("qxl_cabinet3_ic").value=data_text[0][490];
+			document.getElementById("qxl_cabinet3_breaker_state").value=data_text[0][491];
+			document.getElementById("qxl_cabinet4_uab").value=data_text[0][492];
+			document.getElementById("qxl_cabinet4_ubc").value=data_text[0][493];
+			document.getElementById("qxl_cabinet4_uca").value=data_text[0][494];
+			document.getElementById("qxl_cabinet4_ia").value=data_text[0][495];
+			document.getElementById("qxl_cabinet4_ib").value=data_text[0][496];
+			document.getElementById("qxl_cabinet4_ic").value=data_text[0][497];
+			document.getElementById("qxl_cabinet4_breaker_state").value=data_text[0][498];
+			document.getElementById("qxl_cabinet5_uab").value=data_text[0][499];
+			document.getElementById("qxl_cabinet5_ubc").value=data_text[0][500];
+			document.getElementById("qxl_cabinet5_uca").value=data_text[0][501];
+			document.getElementById("qxl_cabinet5_ia").value=data_text[0][502];
+			document.getElementById("qxl_cabinet5_ib").value=data_text[0][503];
+			document.getElementById("qxl_cabinet5_ic").value=data_text[0][504];
+			document.getElementById("qxl_cabinet5_breaker_state").value=data_text[0][505];
+			document.getElementById("qxl_cabinet_des").value=data_text[0][506];
+
+			//显示气象路UPS数据
+			document.getElementById("qxl_ups1_inpower_l1").value=data_text[0][507];
+			document.getElementById("qxl_ups1_inpower_l2").value=data_text[0][508];
+			document.getElementById("qxl_ups1_inpower_l3").value=data_text[0][509];
+			document.getElementById("qxl_ups1_ini_l1").value=data_text[0][510];
+			document.getElementById("qxl_ups1_ini_l2").value=data_text[0][511];
+			document.getElementById("qxl_ups1_ini_l3").value=data_text[0][512];
+			document.getElementById("qxl_ups1_inu_l12").value=data_text[0][513];
+			document.getElementById("qxl_ups1_inu_l23").value=data_text[0][514];
+			document.getElementById("qxl_ups1_inu_l31").value=data_text[0][515];
+			document.getElementById("qxl_ups1_expower_l1").value=data_text[0][516];
+			document.getElementById("qxl_ups1_expower_l2").value=data_text[0][517];
+			document.getElementById("qxl_ups1_expower_l3").value=data_text[0][518];
+			document.getElementById("qxl_ups1_exi_l1").value=data_text[0][519];
+			document.getElementById("qxl_ups1_exi_l2").value=data_text[0][520];
+			document.getElementById("qxl_ups1_exi_l3").value=data_text[0][521];
+			document.getElementById("qxl_ups1_exu_l12").value=data_text[0][522];
+			document.getElementById("qxl_ups1_exu_l23").value=data_text[0][523];
+			document.getElementById("qxl_ups1_exu_l31").value=data_text[0][524];
+			document.getElementById("qxl_ups1_battery_state").value=data_text[0][525];
+			document.getElementById("qxl_ups2_inpower_l1").value=data_text[0][526];
+			document.getElementById("qxl_ups2_inpower_l2").value=data_text[0][527];
+			document.getElementById("qxl_ups2_inpower_l3").value=data_text[0][528];
+			document.getElementById("qxl_ups2_ini_l1").value=data_text[0][529];
+			document.getElementById("qxl_ups2_ini_l2").value=data_text[0][530];
+			document.getElementById("qxl_ups2_ini_l3").value=data_text[0][531];
+			document.getElementById("qxl_ups2_inu_l12").value=data_text[0][532];
+			document.getElementById("qxl_ups2_inu_l23").value=data_text[0][533];
+			document.getElementById("qxl_ups2_inu_l31").value=data_text[0][534];
+			document.getElementById("qxl_ups2_expower_l1").value=data_text[0][535];
+			document.getElementById("qxl_ups2_expower_l2").value=data_text[0][536];
+			document.getElementById("qxl_ups2_expower_l3").value=data_text[0][537];
+			document.getElementById("qxl_ups2_exi_l1").value=data_text[0][538];
+			document.getElementById("qxl_ups2_exi_l2").value=data_text[0][539];
+			document.getElementById("qxl_ups2_exi_l3").value=data_text[0][540];
+			document.getElementById("qxl_ups2_exu_l12").value=data_text[0][541];
+			document.getElementById("qxl_ups2_exu_l23").value=data_text[0][542];
+			document.getElementById("qxl_ups2_exu_l31").value=data_text[0][543];
+			document.getElementById("qxl_ups2_battery_state").value=data_text[0][544];
+			document.getElementById("qxl_ups_des").value=data_text[0][545];
+			
+			//当所有数据全部load完毕，即写入元素的value才能启用保存、提交审核、退出按钮
+			document.getElementById("new_form_submit_button_fixed").disabled=false;
+			document.getElementById("save_button").disabled=false;
+			document.getElementById("finish_input").disabled=false;
+			document.getElementById("quit").disabled=false;
+			
+		}
+	}
+}
+function save()//点击保存按钮，先用ajax检测服务器连接状态是否正常，发起1个ajax的请求到靶向cgi模块test_network_target.py，当xmlHttp.readyState=4和xmlHttp.status=200，说明服务器网络连接正常。
+{
+	//开始初始化XMLHttpRequest对象
+	var xmlHttp;
+	try
+	{
+		//Firefox,Opera 8.0+ safari
+		xmlHttp = new XMLHttpRequest();
+	}
+	
+	catch(e)
+	{
+		//Inter Expplorer
+		try
+		{
+			xmlHttp = new ActiveXObject("Msxm12.XMLHTTP");
+		}
+		
+		catch(e)
+		{
+			try 
+			{
+				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+			}
+			catch(e) 
+			{
+				alert("Your browser does not support AJAX!");
+				return false;
+			}
+		}
+	}
+	
+	//通过Post方式打开连接，发起POST到靶向模块/cgi-bin/test_network_target.py
+	xmlHttp.open("POST","/cgi-bin/test_network_target.py",true);
+	
+	//定义传输的文件HTTP头信息
+	xmlHttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	
+	//发送空的POST数据
+	xmlHttp.send();
+	
+	//获取执行状态
+	xmlHttp.onreadystatechange = function()
+	{
+		if(xmlHttp.readyState == 4 && xmlHttp.status == 200)
+		{
+			document.getElementById("input_form").submit(); //当执行状态为正常时，提交表单。
+		}
+	}
+}
+
+
+function complete_input() //点击结束录入，进入查询界面
+{	
+		var con=confirm("确定完成所有数据录入");
+		if (con==true) 
+		{
+			window.location.href='../form_query_export.html'
+		}
+}
+
+function cancel_quit() //退出页面，删除cookie的formname,form_create_date_time删除操作的表单记录
+{
+	delCookie("formname");
+	delCookie("form_create_date_time");
+	window.location.href='../console_panel.html'
+}
+</script>
+</head>
+<form id="input_form" action="/cgi-bin/new_form_submit.py" method="post">
+<body onload="show_form_info()">
+<table width="558" border="0" align="center">
+  <tr>
+    <td width="84">表单编号：</td>
+    <td width="137"><p id="formname"></p></td>
+  </tr>
+  <tr>
+    <td>巡检人员：</td>
+    <td><p id="recorder_truthname"></p></td>
+    <td>创建时间：</td>
+    <td><p id="form_create_date_time"></p></td>
+  </tr>
+</table>
+<input style="top:70%; position:fixed; width:100px; height:100px; filter:alpha(opacity:30); opacity:0.8; -moz-opacity:0.2; -khtml-opacity:0.9" type="button" name="new_form_submit_button_fixed" id="new_form_submit_button_fixed" value="保存" disabled="true" onclick="save()"/>
+<table width="568" border="1" align="center">
+  <tr>
+    <td colspan="3"><div align="center">2楼机房环境 温湿度</div></td>
+  </tr>
+  <tr>
+    <td width="217"><div align="center">位置</div></td>
+    <td width="163"><div align="center">温度℃</div></td>
+    <td width="166"><div align="center">湿度%</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点1</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem1" type="text" id="f2_tem1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum1" type="text" id="f2_hum1" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点2</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem2" type="text" id="f2_tem2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum2" type="text" id="f2_hum2" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点3</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem3" type="text" id="f2_tem3" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum3" type="text" id="f2_hum3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点4</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem4" type="text" id="f2_tem4" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum4" type="text" id="f2_hum4" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点5</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem5" type="text" id="f2_tem5" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum5" type="text" id="f2_hum5" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点6</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem6" type="text" id="f2_tem6" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum6" type="text" id="f2_hum6" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点7</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem7" type="text" id="f2_tem7" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum7" type="text" id="f2_hum7" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点8</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem8" type="text" id="f2_tem8" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum8" type="text" id="f2_hum8" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点9</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem9" type="text" id="f2_tem9" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum9" type="text" id="f2_hum9" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点10</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem10" type="text" id="f2_tem10" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum10" type="text" id="f2_hum10" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点11</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem11" type="text" id="f2_tem11" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum11" type="text" id="f2_hum11" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点12</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem12" type="text" id="f2_tem12" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum12" type="text" id="f2_hum12" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点13</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem13" type="text" id="f2_tem13" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum13" type="text" id="f2_hum13" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点14</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem14" type="text" id="f2_tem14" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum14" type="text" id="f2_hum14" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点15</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem15" type="text" id="f2_tem15" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum15" type="text" id="f2_hum15" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点16</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem16" type="text" id="f2_tem16" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum16" type="text" id="f2_hum16" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点17</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem17" type="text" id="f2_tem17" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum17" type="text" id="f2_hum17" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点18</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem18" type="text" id="f2_tem18" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum18" type="text" id="f2_hum18" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点19</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem19" type="text" id="f2_tem19" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum19" type="text" id="f2_hum19" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点20</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem20" type="text" id="f2_tem20" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum20" type="text" id="f2_hum20" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点21</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem21" type="text" id="f2_tem21" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum21" type="text" id="f2_hum21" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点22</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem22" type="text" id="f2_tem22" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum22" type="text" id="f2_hum22" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点23</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem23" type="text" id="f2_tem23" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum23" type="text" id="f2_hum23" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点24</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem24" type="text" id="f2_tem24" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum24" type="text" id="f2_hum24" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点25</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem25" type="text" id="f2_tem25" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum25" type="text" id="f2_hum25" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点26</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem26" type="text" id="f2_tem26" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum26" type="text" id="f2_hum26" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点27</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem27" type="text" id="f2_tem27" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum27" type="text" id="f2_hum27" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点28</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem28" type="text" id="f2_tem28" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum28" type="text" id="f2_hum28" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点29</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem29" type="text" id="f2_tem29" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum29" type="text" id="f2_hum29" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点30</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem30" type="text" id="f2_tem30" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum30" type="text" id="f2_hum30" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td height="25"><div align="center">监控点31</div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_tem31" type="text" id="f2_tem31" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="f2_hum31" type="text" id="f2_hum31" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">备注</div></td>
+    <td colspan="2"><div align="center">
+      <textarea style="color:black" name="f2_temandhum_des" cols="40" rows="5" id="f2_temandhum_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1"  align="center">
+  <tr>
+    <td colspan="6"><div align="center">2楼机房精密空调</div></td>
+  </tr>
+  <tr>
+    <td width="140"><div align="center">位置</div></td>
+    <td width="72"><div align="center">回风温度</div></td>
+    <td width="74"><div align="center">回风湿度</div></td>
+    <td width="82"><div align="center">开启状态</div></td>
+    <td width="78"><div align="center">空调状态</div></td>
+    <td width="82"><div align="center">异常噪音</div></td>
+  </tr>
+  <tr>
+    <td height="29"><div align="center">空调AC-1</div></td>
+    <td><div align="center">
+        <input style="color:black" name="ac_tem1" type="text" id="ac_tem1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+        <input style="color:black" name="ac_hum1" type="text" id="ac_hum1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open1" size="1" id="ac_open1">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+      <label for="ac_open1"></label>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_state1" size="1" id="ac_state1">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice1" size="1" id="ac_voice1">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-2</div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_tem2" type="text" id="ac_tem2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_hum2" type="text" id="ac_hum2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open2" size="1" id="ac_open2">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_state2" size="1" id="ac_state2">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice2" size="1" id="ac_voice2">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-3</div></td>
+    <td><div align="center">
+        <input style="color:black" name="ac_tem3" type="text" id="ac_tem3" size="7" maxlength="4" />
+      </div>
+    </label></td>
+    <td><div align="center">
+        <input style="color:black" name="ac_hum3" type="text" id="ac_hum3" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open3" size="1" id="ac_open3">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <div align="center">
+        <select style="color:black" name="ac_state3" size="1" id="ac_state3">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+      </div>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice3" size="1" id="ac_voice3">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-4</div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_tem4" type="text" id="ac_tem4" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_hum4" type="text" id="ac_hum4" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open4" size="1" id="ac_open4">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_state4" size="1" id="ac_state4">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice4" size="1" id="ac_voice4">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-5</div></td>
+    <td><div align="center">
+        <input style="color:black" name="ac_tem5" type="text" id="ac_tem5" size="7" maxlength="4" />
+      </div>
+    </label></td>
+    <td><div align="center">
+        <input style="color:black" name="ac_hum5" type="text" id="ac_hum5" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open5" size="1" id="ac_open5">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <div align="center">
+        <select style="color:black" name="ac_state5" size="1" id="ac_state5">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+      </div>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice5" size="1" id="ac_voice5">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-6</div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_tem6" type="text" id="ac_tem6" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_hum6" type="text" id="ac_hum6" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open6" size="1" id="ac_open6">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_state6" size="1" id="ac_state6">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice6" size="1" id="ac_voice6">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-7</div></td>
+    <td><div align="center">
+        <input style="color:black" name="ac_tem7" type="text" id="ac_tem7" size="7" maxlength="4" />
+      </div>
+    </label></td>
+    <td><div align="center">
+        <input style="color:black" name="ac_hum7" type="text" id="ac_hum7" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open7" size="1" id="ac_open7">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <div align="center">
+        <select style="color:black" name="ac_state7" size="1" id="ac_state7">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+      </div>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice7" size="1" id="ac_voice7">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-8</div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_tem8" type="text" id="ac_tem8" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_hum8" type="text" id="ac_hum8" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open8" size="1" id="ac_open8">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_state8" size="1" id="ac_state8">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice8" size="1" id="ac_voice8">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-9</div></td>
+    <td><div align="center">
+        <input style="color:black" name="ac_tem9" type="text" id="ac_tem9" size="7" maxlength="4" />
+      </div>
+    </td>
+    <td><div align="center">
+        <input style="color:black" name="ac_hum9" type="text" id="ac_hum9" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open9" size="1" id="ac_open9">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <div align="center">
+        <select style="color:black" name="ac_state9" size="1" id="ac_state9">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+      </div>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice9" size="1" id="ac_voice9">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-10</div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_tem10" type="text" id="ac_tem10" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_hum10" type="text" id="ac_hum10" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open10" size="1" id="ac_open10">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_state10" size="1" id="ac_state10">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice10" size="1" id="ac_voice10">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-11</div></td>
+    <td><div align="center">
+        <input style="color:black" name="ac_tem11" type="text" id="ac_tem11" size="7" maxlength="4" />
+      </div>
+    </label></td>
+    <td><div align="center">
+        <input style="color:black" name="ac_hum11" type="text" id="ac_hum11" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open11" size="1" id="ac_open11">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_state11" size="1" id="ac_state11">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice11" size="1" id="ac_voice11">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-12</div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_tem12" type="text" id="ac_tem12" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_hum12" type="text" id="ac_hum12" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open12" size="1" id="ac_open12">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_state12" size="1" id="ac_state12">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice12" size="1" id="ac_voice12">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="23"><div align="center">空调AC-13</div></td>
+    <td><div align="center">
+        <input style="color:black" name="ac_tem13" type="text" id="ac_tem13" size="7" maxlength="4" />
+      </div>
+    </label></td>
+    <td><div align="center">
+        <input style="color:black" name="ac_hum13" type="text" id="ac_hum13" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open13" size="1" id="ac_open13">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <div align="center">
+        <select style="color:black" name="ac_state13" size="1" id="ac_state13">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+      </div>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice13" size="1" id="ac_voice13">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="23" colspan="2"><div align="center">备注</div></td>
+    <td colspan="4"><div align="center">
+      <textarea style="color:black" name="f2_aircondition_des" cols="40" rows="5" id="f2_aircondition_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1"  align="center">
+  <tr>
+    <td colspan="6"><div align="center">2楼机房强电列头柜</div></td>
+  </tr>
+  <tr>
+    <td width="112" rowspan="2"><div align="center">位置</div></td>
+    <td width="93" rowspan="2"><div align="center">运行状态</div></td>
+    <td width="85" rowspan="2"><div align="center">电压(V)</div></td>
+    <td colspan="3"><div align="center">电流(A)</div></td>
+  </tr>
+  <tr>
+    <td width="80"><div align="center">Ia</div></td>
+    <td width="82"><div align="center">Ib</div></td>
+    <td width="76"><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td height="29"><div align="center">P1101A</div></td>
+    <td><div align="center">
+        <select style="color:black" name="P1101A_state" size="1" id="P1101A_state">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+    </div></td>
+    <td><div align="center">
+        <input style="color:black" name="P1101A_voltage" type="text" id="P1101A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P1101A_ia" type="text" id="P1101A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P1101A_ib" type="text" id="P1101A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P1101A_ic" type="text" id="P1101A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P1101B</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P1101B_state" size="1" id="P1101B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P1101B_voltage" type="text" id="P1101B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P1101B_ia" type="text" id="P1101B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P1101B_ib" type="text" id="P1101B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P1101B_ic" type="text" id="P1101B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P1001B</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P1001B_state" size="1" id="P1001B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P1001B_voltage" type="text" id="P1001B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P1001B_ia" type="text" id="P1001B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P1001B_ib" type="text" id="P1001B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P1001B_ic" type="text" id="P1001B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P1001A</div></td>
+    <td><div align="center">
+        <select style="color:black" name="P1001A_state" size="1" id="P1001A_state">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+    </div></td>
+    <td><div align="center">
+        <input style="color:black" name="P1001A_voltage" type="text" id="P1001A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P1001A_ia" type="text" id="P1001A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P1001A_ib" type="text" id="P1001A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P1001A_ic" type="text" id="P1001A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0901A</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0901A_state" size="1" id="P0901A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+        <input style="color:black" name="P0901A_voltage" type="text" id="P0901A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0901A_ia" type="text" id="P0901A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0901A_ib" type="text" id="P0901A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0901A_ic" type="text" id="P0901A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0901B</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0901B_state" size="1" id="P0901B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0901B_voltage" type="text" id="P0901B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0901B_ia" type="text" id="P0901B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0901B_ib" type="text" id="P0901B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0901B_ic" type="text" id="P0901B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0801B</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0801B_state" size="1" id="P0801B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0801B_voltage" type="text" id="P0801B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0801B_ia" type="text" id="P0801B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0801B_ib" type="text" id="P0801B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0801B_ic" type="text" id="P0801B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0801A</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0801A_state" size="1" id="P0801A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+        <input style="color:black" name="P0801A_voltage" type="text" id="P0801A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0801A_ia" type="text" id="P0801A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0801A_ib" type="text" id="P0801A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0801A_ic" type="text" id="P0801A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0701A</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0701A_state" size="1" id="P0701A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+        <input style="color:black" name="P0701A_voltage" type="text" id="P0701A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0701A_ia" type="text" id="P0701A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0701A_ib" type="text" id="P0701A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0701A_ic" type="text" id="P0701A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0701B</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0701B_state" size="1" id="P0701B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0701B_voltage" type="text" id="P0701B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0701B_ia" type="text" id="P0701B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0701B_ib" type="text" id="P0701B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0701B_ic" type="text" id="P0701B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0601B</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0601B_state" size="1" id="P0601B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0601B_voltage" type="text" id="P0601B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0601B_ia" type="text" id="P0601B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0601B_ib" type="text" id="P0601B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0601B_ic" type="text" id="P0601B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0601A</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0601A_state" size="1" id="P0601A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+        <input style="color:black" name="P0601A_voltage" type="text" id="P0601A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0601A_ia" type="text" id="P0601A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0601A_ib" type="text" id="P0601A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0601A_ic" type="text" id="P0601A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">P0501A</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0501A_state" size="1" id="P0501A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0501A_voltage" type="text" id="P0501A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0501A_ia" type="text" id="P0501A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0501A_ib" type="text" id="P0501A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0501A_ic" type="text" id="P0501A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0501B</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0501B_state" size="1" id="P0501B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0501B_voltage" type="text" id="P0501B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0501B_ia" type="text" id="P0501B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0501B_ib" type="text" id="P0501B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0501B_ic" type="text" id="P0501B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0401B</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0401B_state" size="1" id="P0401B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0401B_voltage" type="text" id="P0401B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0401B_ia" type="text" id="P0401B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0401B_ib" type="text" id="P0401B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0401B_ic" type="text" id="P0401B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td height="33"><div align="center">P0401A</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0401A_state" size="1" id="P0401A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0401A_voltage" type="text" id="P0401A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0401A_ia" type="text" id="P0401A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0401A_ib" type="text" id="P0401A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0401A_ic" type="text" id="P0401A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td height="32"><div align="center">P0301A</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0301A_state" size="1" id="P0301A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0301A_voltage" type="text" id="P0301A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0301A_ia" type="text" id="P0301A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0301A_ib" type="text" id="P0301A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0301A_ic" type="text" id="P0301A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0301B</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0301B_state" size="1" id="P0301B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0301B_voltage" type="text" id="P0301B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0301B_ia" type="text" id="P0301B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0301B_ib" type="text" id="P0301B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0301B_ic" type="text" id="P0301B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td height="31"><div align="center">P0101A</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0101A_state" size="1" id="P0101A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0101A_voltage" type="text" id="P0101A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0101A_ia" type="text" id="P0101A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0101A_ib" type="text" id="P0101A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0101A_ic" type="text" id="P0101A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0101B</div></td>
+    <td><div align="center">
+      <select style="color:black" name="P0101B_state" size="1" id="P0101B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0101B_voltage" type="text" id="P0101B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0101B_ia" type="text" id="P0101B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0101B_ib" type="text" id="P0101B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="P0101B_ic" type="text" id="P0101B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td height="24" colspan="2"><div align="center">备注</div></td>
+    <td colspan="4"><div align="center">
+      <textarea style="color:black" name="f2_pmm_des" cols="40" rows="5" id="f2_pmm_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1"  align="center">
+  <tr>
+    <td height="13" colspan="4"><div align="center">2楼机房环境</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">位置</div></td>
+    <td colspan="3"><div align="center">状态</div></td>
+  </tr>
+  <tr>
+    <td width="251"><div align="center">消防主机状态</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="f2_fire_host" size="1" id="f2_fire_host">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">消防钢瓶</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="f2_fire_bottle" size="1" id="f2_fire_bottle">
+        <option value="0">正压</option>
+        <option value="1">负压</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">温感烟感运行状态</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="f2_fire_sensor" size="1" id="f2_fire_sensor">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">消防通道</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="f2_fire_access" size="1" id="f2_fire_access">
+        <option value="0">通畅</option>
+        <option value="1">阻塞</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">消防指示牌</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="f2_fire_sign" size="1" id="f2_fire_sign">
+        <option value="0">清晰</option>
+        <option value="1">模糊</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">消防声光报警</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="f2_fire_alarm" size="1" id="f2_fire_alarm">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">新风机状态</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="f2_jxc_state" size="1" id="f2_jxc_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">新风机开启状态</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="f2_jxc_open" size="1" id="f2_jxc_open">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调漏水绳</div></td>
+    <td colspan="3"><div align="center">
+      <input style="color:black" name="f2_leak_ac" id="f2_leak_ac_1" type="radio" onclick="f2_leak_ac_close()" value="0" checked="checked"/> 正常
+      <input style="color:black" type="radio" name="f2_leak_ac" id="f2_leak_ac_2" value="1"/> 
+      漏水 漏点
+      <input style="color:black" name="f2_leak_ac_spot" type="text" id="f2_leak_ac_spot" size="8" maxlength="3" />
+    m</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">走廊漏水绳</div></td>
+    <td width="301" colspan="3"><div align="center">
+      <input style="color:black" name="f2_leak_corridor" id="f2_leak_corridor_1" type="radio" onclick="f2_leak_corridor_close()" value="0" checked="checked"/> 正常
+      <input style="color:black" type="radio" name="f2_leak_corridor" id="f2_leak_corridor_2" value="1"/> 
+      漏水 漏点 
+      <input style="color:black" name="f2_leak_corridor_spot" type="text" id="f2_leak_corridor_spot" size="8" maxlength="3" />
+    m</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">大屏幕</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="screen_state" size="1" id="screen_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">动环</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="observer_state" size="1" id="observer_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">入侵</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="f2_defend_state" size="1" id="f2_defend_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">痕迹</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="f2_trace_state" size="1" id="f2_trace_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控室门</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="monitorroom_door" size="1" id="monitorroom_door">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">测试间门</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="testroom_door" size="1" id="testroom_door">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">机房大门</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="gate_door" size="1" id="gate_door">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">钢瓶间门</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="bottleroom_door" size="1" id="bottleroom_door">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">楼梯门口</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="floor_door" size="1" id="floor_door">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">玻璃门1</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="glass_door1" size="1" id="glass_door1">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">玻璃门2</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="glass_door2" size="1" id="glass_door2">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">玻璃门3</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="glass_door3" size="1" id="glass_door3">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">玻璃门4</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="glass_door4" size="1" id="glass_door4">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">机柜门锁门情况</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="rack_door" size="1" id="rack_door">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">备注</div></td>
+    <td colspan="3"><div align="center">
+      <textarea style="color:black" name="f2_environment_des" cols="40" rows="5" id="f2_environment_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1" align="center">
+  <tr>
+    <td colspan="3"><div align="center">负1楼温湿度</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">位置</div></td>
+    <td width="176"><div align="center">温度℃</div></td>
+    <td width="166"><div align="center">湿度%</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点21</div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_tem21" type="text" id="b1_tem21" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_hum21" type="text" id="b1_hum21" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点22</div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_tem22" type="text" id="b1_tem22" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_hum22" type="text" id="b1_hum22" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点23</div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_tem23" type="text" id="b1_tem23" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_hum23" type="text" id="b1_hum23" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点24</div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_tem24" type="text" id="b1_tem24" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_hum24" type="text" id="b1_hum24" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点25</div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_tem25" type="text" id="b1_tem25" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_hum25" type="text" id="b1_hum25" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点26</div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_tem26" type="text" id="b1_tem26" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_hum26" type="text" id="b1_hum26" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点27</div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_tem27" type="text" id="b1_tem27" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_hum27" type="text" id="b1_hum27" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点28</div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_tem28" type="text" id="b1_tem28" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_hum28" type="text" id="b1_hum28" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点29</div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_tem29" type="text" id="b1_tem29" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="b1_hum29" type="text" id="b1_hum29" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td width="204"><div align="center">备注</div></td>
+    <td colspan="2"><div align="center">
+      <textarea style="color:black" name="b1_temandhum_des" cols="40" rows="5" id="b1_temandhum_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1" align="center">
+  <tr>
+    <td colspan="6"><div align="center">负1楼机房精密空调</div></td>
+  </tr>
+  <tr>
+    <td width="112"><div align="center">位置</div></td>
+    <td width="87"><div align="center">回风温度</div></td>
+    <td width="78"><div align="center">回风湿度</div></td>
+    <td width="91"><div align="center">开启状态</div></td>
+    <td width="81"><div align="center">空调状态</div></td>
+    <td width="79"><div align="center">异常噪音</div></td>
+  </tr>
+  <tr>
+    <td height="29"><div align="center">空调AC-14</div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_tem14" type="text" id="ac_tem14" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_hum14" type="text" id="ac_hum14" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open14" size="1" id="ac_open14">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_state14" size="1" id="ac_state14">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice14" size="1" id="ac_voice14">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-15</div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_tem15" type="text" id="ac_tem15" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_hum15" type="text" id="ac_hum15" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open15" size="1" id="ac_open15">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_state15" size="1" id="ac_state15">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice15" size="1" id="ac_voice15">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-16</div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_tem16" type="text" id="ac_tem16" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_hum16" type="text" id="ac_hum16" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open16" size="1" id="ac_open16">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <div align="center">
+        <select style="color:black" name="ac_state16" size="1" id="ac_state16">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+      </div>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice16" size="1" id="ac_voice16">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-17</div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_tem17" type="text" id="ac_tem17" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="ac_hum17" type="text" id="ac_hum17" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_open17" size="1" id="ac_open17">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_state17" size="1" id="ac_state17">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="ac_voice17" size="1" id="ac_voice17">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="23" colspan="2"><div align="center">备注</div></td>
+    <td colspan="4"><div align="center">
+      <textarea style="color:black" name="b1_aircondition_des" cols="40" rows="5" id="b1_aircondition_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1" align="center">
+  <tr>
+    <td height="24" colspan="4"><div align="center">负1楼环境</div></td>
+  </tr>
+  <tr>
+    <td width="204"><div align="center">空调漏水绳</div></td>
+    <td width="348" colspan="3"><div align="center">
+      <input style="color:black" name="b1_leak_ac" id="b1_leak_ac_1" type="radio" onclick="b1_leak_ac_close()" value="0" checked="checked"/>
+      正常
+      <input style="color:black" type="radio" name="b1_leak_ac" id="b1_leak_ac_2" value="1"/>
+      漏水 漏点
+      <input style="color:black" name="b1_leak_ac_spot" type="text" id="b1_leak_ac_spot" size="8" maxlength="3" />
+      m</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">水井漏水</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="b1_leak_well" size="1" id="b1_leak_well">
+        <option value="0">正常</option>
+        <option value="1">漏水</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">新风机状态</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="b1_jxc_state" size="1" id="b1_jxc_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">新风机开启状态</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="b1_jxc_open" size="1" id="b1_jxc_open">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">消防</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="b1_fire_state" size="1" id="b1_fire_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">异味</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="b1_smell_state" size="1" id="b1_smell_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">入侵</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="b1_defend_state" size="1" id="b1_defend_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">痕迹</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="b1_trace_state" size="1" id="b1_trace_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">左边门</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="b1_left_door" size="1" id="b1_left_door">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">右边门 </div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="b1_right_door" size="1" id="b1_right_door">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">备注</div></td>
+    <td colspan="3"><div align="center">
+      <textarea style="color:black" name="b1_environment_des" cols="40" rows="5" id="b1_environment_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1" align="center">
+  <tr>
+    <td colspan="4"><div align="center">负1楼机房不间断电源</div></td>
+  </tr>
+  <tr>
+    <td width="201" rowspan="7"><div align="center">UPSA1</div></td>
+    <td width="120"><div align="center">用量(%kVA)</div></td>
+    <td colspan="2"><div align="center">中性线电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="UPSA1_usage" type="text" id="UPSA1_usage" size="7" maxlength="4" />
+    </div></td>
+    <td colspan="2"><div align="center">
+      <input style="color:black" name="UPSA1_FCNC" type="text" id="UPSA1_FCNC" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">有功功率(KW)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td width="107"><div align="center">L2</div></td>
+    <td width="112"><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="UPSA1_power_l1" type="text" id="UPSA1_power_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="UPSA1_power_l2" type="text" id="UPSA1_power_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="UPSA1_power_l3" type="text" id="UPSA1_power_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">电池组电压(V)</div></td>
+    <td><div align="center">报警状态</div></td>
+    <td><div align="center">B1UPSA1电池组</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="UPSA1_battery_voltage" type="text" id="UPSA1_battery_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="UPSA1_alert_state" size="1" id="UPSA1_alert_state">
+        <option value="0">无</option>
+        <option value="1">有</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="UPSA1_battery_state" size="1" id="UPSA1_battery_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">UPSA2</div></td>
+    <td><div align="center">用量(%kVA)</div></td>
+    <td colspan="2"><div align="center">中性线电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="UPSA2_usage" type="text" id="UPSA2_usage" size="7" maxlength="4" />
+    </div></td>
+    <td colspan="2"><div align="center">
+      <input style="color:black" name="UPSA2_FCNC" type="text" id="UPSA2_FCNC" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+   <tr>
+     <td colspan="3"><div align="center">有功功率(KW)</div></td>
+   </tr>
+   <tr>
+     <td><div align="center">L1</div></td>
+     <td width="107"><div align="center">L2</div></td>
+     <td width="112"><div align="center">L3</div></td>
+   </tr>
+   <tr>
+     <td><div align="center">
+       <input style="color:black" name="UPSA2_power_l1" type="text" id="UPSA2_power_l1" size="7" maxlength="4" />
+     </div></td>
+     <td><div align="center">
+       <input style="color:black" name="UPSA2_power_l2" type="text" id="UPSA2_power_l2" size="7" maxlength="4" />
+     </div></td>
+     <td><div align="center">
+       <input style="color:black" name="UPSA2_power_l3" type="text" id="UPSA2_power_l3" size="7" maxlength="4" />
+     </div></td>
+   </tr>
+   <tr>
+     <td><div align="center">电池组电压(V)</div></td>
+     <td><div align="center">报警状态</div></td>
+     <td><div align="center">B1UPSA2电池组</div></td>
+   </tr>
+   <tr>
+     <td><div align="center">
+       <input style="color:black" name="UPSA2_battery_voltage" type="text" id="UPSA2_battery_voltage" size="7" maxlength="4" />
+     </div></td>
+     <td><div align="center">
+       <select style="color:black" name="UPSA2_alert_state" size="1" id="UPSA2_alert_state">
+         <option value="0">无</option>
+         <option value="1">有</option>
+       </select>
+     </div></td>
+     <td><div align="center">
+       <select style="color:black" name="UPSA2_battery_state" size="1" id="UPSA2_battery_state">
+         <option value="0">正常</option>
+         <option value="1">异常</option>
+        </select>
+     </div></td>
+   </tr>
+   <tr>
+     <td rowspan="7"><div align="center">UPSB1</div></td>
+     <td><div align="center">用量(%kVA)</div></td>
+     <td colspan="2"><div align="center">中性线电流(A)</div></td>
+   </tr>
+   <tr>
+    <td><div align="center">
+      <input style="color:black" name="UPSB1_usage" type="text" id="UPSB1_usage" size="7" maxlength="4" />
+    </div></td>
+    <td colspan="2"><div align="center">
+      <input style="color:black" name="UPSB1_FCNC" type="text" id="UPSB1_FCNC" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+     <td colspan="3"><div align="center">有功功率(KW)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td width="107"><div align="center">L2</div></td>
+    <td width="112"><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="UPSB1_power_l1" type="text" id="UPSB1_power_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="UPSB1_power_l2" type="text" id="UPSB1_power_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="UPSB1_power_l3" type="text" id="UPSB1_power_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">电池组电压(V)</div></td>
+    <td><div align="center">报警状态</div></td>
+    <td><div align="center">B1UPSB1电池组</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="UPSB1_battery_voltage" type="text" id="UPSB1_battery_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="UPSB1_alert_state" size="1" id="UPSB1_alert_state">
+        <option value="0">无</option>
+        <option value="1">有</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="UPSB1_battery_state" size="1" id="UPSB1_battery_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">UPSB2</div></td>
+    <td><div align="center">用量(%kVA)</div></td>
+    <td colspan="2"><div align="center">中性线电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="UPSB2_usage" type="text" id="UPSB2_usage" size="7" maxlength="4" />
+    </div></td>
+    <td colspan="2"><div align="center">
+      <input style="color:black" name="UPSB2_FCNC" type="text" id="UPSB2_FCNC" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">有功功率(KW)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td width="107"><div align="center">L2</div></td>
+    <td width="112"><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="UPSB2_power_l1" type="text" id="UPSB2_power_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="UPSB2_power_l2" type="text" id="UPSB2_power_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="UPSB2_power_l3" type="text" id="UPSB2_power_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">电池组电压(V)</div></td>
+    <td><div align="center">报警状态</div></td>
+    <td><div align="center">B1UPSB2电池组</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="UPSB2_battery_voltage" type="text" id="UPSB2_battery_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="UPSB2_alert_state" size="1" id="UPSB2_alert_state">
+        <option value="0">无</option>
+        <option value="1">有</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="UPSB2_battery_state" size="1" id="UPSB2_battery_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">备注</div></td>
+    <td colspan="3"><div align="center">
+      <textarea style="color:black" name="b1_UPS_des" cols="40" rows="5" id="b1_UPS_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1" align="center">
+  <tr>
+    <td colspan="5"><div align="center">负1楼机房低压供电系统</div></td>
+  </tr>
+  <tr>
+    <td width="128" rowspan="14"><div align="center">UPS输入</div></td>
+    <td width="113" rowspan="7"><div align="center">B1B1电柜9</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td width="104"><div align="center">Uab</div></td>
+    <td width="97"><div align="center">Ubc</div></td>
+    <td width="92"><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet9_uab" type="text" id="cabinet9_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet9_ubc" type="text" id="cabinet9_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet9_uca" type="text" id="cabinet9_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet9_ia" type="text" id="cabinet9_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet9_ib" type="text" id="cabinet9_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet9_ic" type="text" id="cabinet9_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="cabinet9_breaker_state" size="1" id="cabinet9_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">B1A1电柜4</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Uab</div></td>
+    <td><div align="center">Ubc</div></td>
+    <td><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet4_uab" type="text" id="cabinet4_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet4_ubc" type="text" id="cabinet4_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet4_uca" type="text" id="cabinet4_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet4_ia" type="text" id="cabinet4_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet4_ib" type="text" id="cabinet4_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet4_ic" type="text" id="cabinet4_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="cabinet4_breaker_state" size="1" id="cabinet4_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">母联</div></td>
+    <td rowspan="7"><div align="center">B1AP3电柜7</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Uab</div></td>
+    <td><div align="center">Ubc</div></td>
+    <td><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet7_uab" type="text" id="cabinet7_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet7_ubc" type="text" id="cabinet7_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet7_uca" type="text" id="cabinet7_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet7_ia" type="text" id="cabinet7_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet7_ib" type="text" id="cabinet7_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet7_ic" type="text" id="cabinet7_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="cabinet7_breaker_state" size="1" id="cabinet7_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="14"><div align="center">动力输入</div></td>
+    <td rowspan="7"><div align="center">B1AP1电柜8</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Uab</div></td>
+    <td><div align="center">Ubc</div></td>
+    <td><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet8_uab" type="text" id="cabinet8_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet8_ubc" type="text" id="cabinet8_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet8_uca" type="text" id="cabinet8_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet8_ia" type="text" id="cabinet8_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet8_ib" type="text" id="cabinet8_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet8_ic" type="text" id="cabinet8_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="cabinet8_breaker_state" size="1" id="cabinet8_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">B1AP5电柜3</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Uab</div></td>
+    <td><div align="center">Ubc</div></td>
+    <td><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet3_uab" type="text" id="cabinet3_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet3_ubc" type="text" id="cabinet3_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet3_uca" type="text" id="cabinet3_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet3_ia" type="text" id="cabinet3_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet3_ib" type="text" id="cabinet3_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet3_ic" type="text" id="cabinet3_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="cabinet3_breaker_state" size="1" id="cabinet3_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="28"><div align="center">UPS输出</div></td>
+    <td rowspan="7"><div align="center">1UPSB2电柜6</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Uab</div></td>
+    <td><div align="center">Ubc</div></td>
+    <td><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet6_uab" type="text" id="cabinet6_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet6_ubc" type="text" id="cabinet6_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet6_uca" type="text" id="cabinet6_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet6_ia" type="text" id="cabinet6_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet6_ib" type="text" id="cabinet6_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet6_ic" type="text" id="cabinet6_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="cabinet6_breaker_state" size="1" id="cabinet6_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">1UPSB1电柜5</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Uab</div></td>
+    <td><div align="center">Ubc</div></td>
+    <td><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet5_uab" type="text" id="cabinet5_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet5_ubc" type="text" id="cabinet5_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet5_uca" type="text" id="cabinet5_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet5_ia" type="text" id="cabinet5_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet5_ib" type="text" id="cabinet5_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet5_ic" type="text" id="cabinet5_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="cabinet5_breaker_state" size="1" id="cabinet5_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">1UPSA2电柜2</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Uab</div></td>
+    <td><div align="center">Ubc</div></td>
+    <td><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet2_uab" type="text" id="cabinet2_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet2_ubc" type="text" id="cabinet2_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet2_uca" type="text" id="cabinet2_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet2_ia" type="text" id="cabinet2_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet2_ib" type="text" id="cabinet2_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet2_ic" type="text" id="cabinet2_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="cabinet2_breaker_state" size="1" id="cabinet2_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">1UPSA1电柜1</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Uab</div></td>
+    <td><div align="center">Ubc</div></td>
+    <td><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet1_uab" type="text" id="cabinet1_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet1_ubc" type="text" id="cabinet1_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet1_uca" type="text" id="cabinet1_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="cabinet1_ia" type="text" id="cabinet1_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet1_ib" type="text" id="cabinet1_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="cabinet1_ic" type="text" id="cabinet1_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="cabinet1_breaker_state" size="1" id="cabinet1_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="2"><div align="center">备注</div></td>
+    <td colspan="3"><div align="center">
+      <textarea style="color:black" name="b1_cabinet_des" cols="40" rows="5" id="b1_cabinet_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1" align="center">
+  <tr>
+    <td colspan="3"><div align="center">气象路机房温湿度</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">位置</div></td>
+    <td><div align="center">温度℃</div></td>
+    <td><div align="center">湿度%</div></td>
+  </tr>
+  <tr>
+    <td width="217"><div align="center">监控点1</div></td>
+    <td width="163"><div align="center">
+      <input style="color:black" name="qxl_tem1" type="text" id="qxl_tem1" size="7" maxlength="4" />
+    </div></td>
+    <td width="166"><div align="center">
+      <input style="color:black" name="qxl_hum1" type="text" id="qxl_hum1" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点2</div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_tem2" type="text" id="qxl_tem2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_hum2" type="text" id="qxl_hum2" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点3</div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_tem3" type="text" id="qxl_tem3" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_hum3" type="text" id="qxl_hum3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点4</div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_tem4" type="text" id="qxl_tem4" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_hum4" type="text" id="qxl_hum4" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点5</div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_tem5" type="text" id="qxl_tem5" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_hum5" type="text" id="qxl_hum5" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点6</div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_tem6" type="text" id="qxl_tem6" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_hum6" type="text" id="qxl_hum6" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点7</div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_tem7" type="text" id="qxl_tem7" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_hum7" type="text" id="qxl_hum7" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点8</div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_tem8" type="text" id="qxl_tem8" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_hum8" type="text" id="qxl_hum8" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点9</div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_tem9" type="text" id="qxl_tem9" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_hum9" type="text" id="qxl_hum9" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点10</div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_tem10" type="text" id="qxl_tem10" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_hum10" type="text" id="qxl_hum10" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">备注</div></td>
+    <td colspan="2"><div align="center">
+      <textarea style="color:black" name="qxl_temandhum_des" cols="40" rows="5" id="qxl_temandhum_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1" align="center">
+  <tr>
+    <td colspan="6"><div align="center">气象路机房精密空调</div></td>
+  </tr>
+  <tr>
+    <td width="121"><div align="center">位置</div></td>
+    <td width="89"><div align="center">回风温度</div></td>
+    <td width="83"><div align="center">回风湿度</div></td>
+    <td width="78"><div align="center">开启状态</div></td>
+    <td width="79"><div align="center">空调状态</div></td>
+    <td width="78"><div align="center">异常噪音</div></td>
+  </tr>
+  <tr>
+    <td height="29"><div align="center">空调AC-1</div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ac_tem1" type="text" id="qxl_ac_tem1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ac_hum1" type="text" id="qxl_ac_hum1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="qxl_ac_open1" size="1" id="qxl_ac_open1">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="qxl_ac_state1" size="1" id="qxl_ac_state1">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="qxl_ac_voice1" size="1" id="qxl_ac_voice1">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-2</div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ac_tem2" type="text" id="qxl_ac_tem2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ac_hum2" type="text" id="qxl_ac_hum2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="qxl_ac_open2" size="1" id="qxl_ac_open2">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="qxl_ac_state2" size="1" id="qxl_ac_state2">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select style="color:black" name="qxl_ac_voice2" size="1" id="qxl_ac_voice2">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="23" colspan="2"><div align="center">备注</div><label for="qxl_aircondition_des"></label></td>
+    <td colspan="4"><div align="center">
+      <textarea style="color:black" name="qxl_aircondition_des" cols="40" rows="5" id="qxl_aircondition_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1" align="center">
+  <tr>
+    <td height="24" colspan="4"><div align="center">气象路机房环境</div></td>
+  </tr>
+  <tr>
+    <td width="218"><div align="center">45m漏水绳</div></td>
+    <td width="334" colspan="3"><div align="center">
+     <input style="color:black" name="qxl_leak_45m" type="radio" id="qxl_leak_45m_1" onclick="qxl_leak_45m_close()" value="0" checked="checked"/>
+      正常
+      <input style="color:black" type="radio" name="qxl_leak_45m" id="qxl_leak_45m_2" value="1"/>
+      漏水 漏点
+      <input style="color:black" name="qxl_leak_45m_spot" type="text" id="qxl_leak_45m_spot" size="8" maxlength="3" />
+      m</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">15m漏水绳</div></td>
+    <td colspan="3"><div align="center">
+      <input style="color:black" name="qxl_leak_15m" type="radio" id="qxl_leak_15m_1" onclick="qxl_leak_15m_close()" value="0" checked="checked"/>
+      正常
+      <input style="color:black" type="radio" name="qxl_leak_15m" id="qxl_leak_15m_2" value="1"/>
+      漏水 漏点
+      <input style="color:black" name="qxl_leak_15m_spot" type="text" id="qxl_leak_15m_spot" size="8" maxlength="3" />
+      m</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">门1</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="qxl_door1" size="1" id="qxl_door1">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">门2</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="qxl_door2" size="1" id="qxl_door2">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">门3</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="qxl_door3" size="1" id="qxl_door3">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">门4</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="qxl_door4" size="1" id="qxl_door4">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">入侵检测</div></td>
+    <td colspan="3"><div align="center">
+      <select style="color:black" name="qxl_defend_state" size="1" id="qxl_defend_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">备注</div></td>
+    <td colspan="3"><div align="center">
+      <textarea style="color:black" name="qxl_environment_des" cols="40" rows="5" id="qxl_environment_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1" align="center">
+  <tr>
+    <td colspan="5"><div align="center">气象路机房精密配电柜</div></td>
+  </tr>
+  <tr>
+    <td width="109" rowspan="7"><div align="center">1号精密配电柜</div></td>
+    <td width="103" rowspan="7"><div align="center">UPS1-P0201-A</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td width="118"><div align="center">Uab</div></td>
+    <td width="105"><div align="center">Ubc</div></td>
+    <td width="99"><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_pmm1_uab" type="text" id="qxl_pmm1_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_pmm1_ubc" type="text" id="qxl_pmm1_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_pmm1_uca" type="text" id="qxl_pmm1_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_pmm1_ia" type="text" id="qxl_pmm1_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_pmm1_ib" type="text" id="qxl_pmm1_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_pmm1_ic" type="text" id="qxl_pmm1_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">运行状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="qxl_pmm1_state" size="1" id="qxl_pmm1_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">2号精密配电柜</div></td>
+    <td rowspan="7"><div align="center">UPS2-P0201-B</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Uab</div></td>
+    <td><div align="center">Ubc</div></td>
+    <td><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_pmm2_uab" type="text" id="qxl_pmm2_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_pmm2_ubc" type="text" id="qxl_pmm2_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_pmm2_uca" type="text" id="qxl_pmm2_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_pmm2_ia" type="text" id="qxl_pmm2_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_pmm2_ib" type="text" id="qxl_pmm2_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_pmm2_ic" type="text" id="qxl_pmm2_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">运行状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="qxl_pmm2_state" size="1" id="qxl_pmm2_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="2"><div align="center">备注</div></td>
+    <td colspan="3"><div align="center">
+      <textarea style="color:black" name="qxl_pmm_des" cols="40" rows="5" id="qxl_pmm_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="570" border="1" align="center">
+  <tr>
+    <td colspan="5"><div align="center">气象路机房低压供电系统</div></td>
+  </tr>
+  <tr>
+    <td width="110" rowspan="7"><div align="center">1号电量仪</div></td>
+    <td width="105" rowspan="7"><div align="center">UPS输出1</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td width="118"><div align="center">Uab</div></td>
+    <td width="106"><div align="center">Ubc</div></td>
+    <td width="97"><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet1_uab" type="text" id="qxl_cabinet1_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet1_ubc" type="text" id="qxl_cabinet1_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet1_uca" type="text" id="qxl_cabinet1_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet1_ia" type="text" id="qxl_cabinet1_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet1_ib" type="text" id="qxl_cabinet1_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet1_ic" type="text" id="qxl_cabinet1_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="qxl_cabinet1_breaker_state" size="1" id="qxl_cabinet1_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">2号电量仪</div></td>
+    <td rowspan="7"><div align="center">UPS输出2</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td width="118"><div align="center">Uab</div></td>
+    <td width="106"><div align="center">Ubc</div></td>
+    <td width="97"><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet2_uab" type="text" id="qxl_cabinet2_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet2_ubc" type="text" id="qxl_cabinet2_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet2_uca" type="text" id="qxl_cabinet2_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet2_ia" type="text" id="qxl_cabinet2_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet2_ib" type="text" id="qxl_cabinet2_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet2_ic" type="text" id="qxl_cabinet2_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="qxl_cabinet2_breaker_state" size="1" id="qxl_cabinet2_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">3号电量仪</div></td>
+    <td rowspan="7"><div align="center">UPS输入1</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td width="118"><div align="center">Uab</div></td>
+    <td width="106"><div align="center">Ubc</div></td>
+    <td width="97"><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet3_uab" type="text" id="qxl_cabinet3_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet3_ubc" type="text" id="qxl_cabinet3_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet3_uca" type="text" id="qxl_cabinet3_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet3_ia" type="text" id="qxl_cabinet3_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet3_ib" type="text" id="qxl_cabinet3_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet3_ic" type="text" id="qxl_cabinet3_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="qxl_cabinet3_breaker_state" size="1" id="qxl_cabinet3_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">4号电量仪</div></td>
+    <td rowspan="7"><div align="center">UPS输入2</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Uab</div></td>
+    <td><div align="center">Ubc</div></td>
+    <td><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet4_uab" type="text" id="qxl_cabinet4_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet4_ubc" type="text" id="qxl_cabinet4_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet4_uca" type="text" id="qxl_cabinet4_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet4_ia" type="text" id="qxl_cabinet4_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet4_ib" type="text" id="qxl_cabinet4_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet4_ic" type="text" id="qxl_cabinet4_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="qxl_cabinet4_breaker_state" size="1" id="qxl_cabinet4_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">5号电量仪</div></td>
+    <td rowspan="7"><div align="center">总动力配电</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Uab</div></td>
+    <td><div align="center">Ubc</div></td>
+    <td><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet5_uab" type="text" id="qxl_cabinet5_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet5_ubc" type="text" id="qxl_cabinet5_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet5_uca" type="text" id="qxl_cabinet5_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet5_ia" type="text" id="qxl_cabinet5_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet5_ib" type="text" id="qxl_cabinet5_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_cabinet5_ic" type="text" id="qxl_cabinet5_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select style="color:black" name="qxl_cabinet5_breaker_state" size="1" id="qxl_cabinet5_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="2"><div align="center">备注</div></td>
+    <td colspan="3"><div align="center">
+      <textarea style="color:black" name="qxl_cabinet_des" cols="40" rows="5" id="qxl_cabinet_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="569" border="1" align="center">
+  <tr>
+    <td colspan="4"><div align="center">气象路机房不间断电源</div></td>
+  </tr>
+  <tr>
+    <td width="222" rowspan="18"><div align="center">UPS1</div></td>
+    <td colspan="3"><div align="center">输入线电压</div></td>
+  </tr>
+  <tr>
+    <td width="116"><div align="center">L1-2</div></td>
+    <td width="108"><div align="center">L2-3</div></td>
+    <td width="95"><div align="center">L3-1</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_inu_l12" type="text" id="qxl_ups1_inu_l12" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_inu_l23" type="text" id="qxl_ups1_inu_l23" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_inu_l31" type="text" id="qxl_ups1_inu_l31" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_ini_l1" type="text" id="qxl_ups1_ini_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_ini_l2" type="text" id="qxl_ups1_ini_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_ini_l3" type="text" id="qxl_ups1_ini_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入有功功率(KW)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_inpower_l1" type="text" id="qxl_ups1_inpower_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_inpower_l2" type="text" id="qxl_ups1_inpower_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_inpower_l3" type="text" id="qxl_ups1_inpower_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输出线电压</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1-2</div></td>
+    <td><div align="center">L2-3</div></td>
+    <td><div align="center">L3-1</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_exu_l12" type="text" id="qxl_ups1_exu_l12" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_exu_l23" type="text" id="qxl_ups1_exu_l23" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_exu_l31" type="text" id="qxl_ups1_exu_l31" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输出电流</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_exi_l1" type="text" id="qxl_ups1_exi_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_exi_l2" type="text" id="qxl_ups1_exi_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_exi_l3" type="text" id="qxl_ups1_exi_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输出有功功率(KW)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_expower_l1" type="text" id="qxl_ups1_expower_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_expower_l2" type="text" id="qxl_ups1_expower_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups1_expower_l3" type="text" id="qxl_ups1_expower_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="18"><div align="center">UPS2</div></td>
+    <td colspan="3"><div align="center">输入线电压</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1-2</div></td>
+    <td><div align="center">L2-3</div></td>
+    <td><div align="center">L3-1</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_inu_l12" type="text" id="qxl_ups2_inu_l12" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_inu_l23" type="text" id="qxl_ups2_inu_l23" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_inu_l31" type="text" id="qxl_ups2_inu_l31" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_ini_l1" type="text" id="qxl_ups2_ini_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_ini_l2" type="text" id="qxl_ups2_ini_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_ini_l3" type="text" id="qxl_ups2_ini_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入有功功率(KW)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_inpower_l1" type="text" id="qxl_ups2_inpower_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_inpower_l2" type="text" id="qxl_ups2_inpower_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_inpower_l3" type="text" id="qxl_ups2_inpower_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输出线电压</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1-2</div></td>
+    <td><div align="center">L2-3</div></td>
+    <td><div align="center">L3-1</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_exu_l12" type="text" id="qxl_ups2_exu_l12" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_exu_l23" type="text" id="qxl_ups2_exu_l23" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_exu_l31" type="text" id="qxl_ups2_exu_l31" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输出电流</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_exi_l1" type="text" id="qxl_ups2_exi_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_exi_l2" type="text" id="qxl_ups2_exi_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_exi_l3" type="text" id="qxl_ups2_exi_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输出有功功率(KW)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_expower_l1" type="text" id="qxl_ups2_expower_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_expower_l2" type="text" id="qxl_ups2_expower_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input style="color:black" name="qxl_ups2_expower_l3" type="text" id="qxl_ups2_expower_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="2"><div align="center">蓄电池</div></td>
+    <td colspan="2"><div align="center">UPS1电池组</div></td>
+    <td><div align="center">
+      <select style="color:black" name="qxl_ups1_battery_state" size="1" id="qxl_ups1_battery_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="2"><div align="center">UPS2电池组</div></td>
+    <td><div align="center">
+      <select style="color:black" name="qxl_ups2_battery_state" size="1" id="qxl_ups2_battery_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">备注</div></td>
+    <td colspan="3"><div align="center">
+      <textarea style="color:black" name="qxl_ups_des" cols="40" rows="5" id="qxl_ups_des"></textarea>
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="4">&nbsp;</td>
+  </tr>
+</table>
+</br>
+<table width="537" border="0" align="center">
+  <tr>
+    <td width="53">&nbsp;</td>
+    <td width="76">&nbsp;</td>
+    <td width="117"><input type="button" name="save_button" id="save_button" value="保存" disabled="true" onclick="save()"/></td>
+    <td width="125"><input type="button" name="finish_input" id="finish_input" value="结束录入" onclick="complete_input()" disabled="true"></td>
+    <td width="52"><input type="button" name="quit" id="quit" value="退出" onclick="cancel_quit()" disabled="true"></td>
+  </tr>
+</table>
+</form>
+</body>
+</html>

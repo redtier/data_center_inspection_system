@@ -1,0 +1,1007 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>气象路办公机房基础环境数据记录</title>
+<script>
+function qxl_leak_45m_close()
+{
+	document.getElementById("qxl_leak_45m_spot").disabled=true
+}
+function qxl_leak_45m_open()
+{
+	document.getElementById("qxl_leak_45m_spot").disabled=false
+}
+function qxl_leak_15m_close()
+{
+	document.getElementById("qxl_leak_15m_spot").disabled=true
+}
+function qxl_leak_15m_open()
+{
+	document.getElementById("qxl_leak_15m_spot").disabled=false
+}
+function getCookie(cookie_name) //该函数用来返回特定的Cookie
+{
+    var allcookies = document.cookie;
+    var cookie_pos = allcookies.indexOf(cookie_name);   //索引的长度
+  
+    // 如果找到了索引，就代表cookie存在，
+    // 反之，就说明不存在。
+    if (cookie_pos != -1)
+    {
+        // 把cookie_pos放在值的开始，只要给值加1即可。
+        cookie_pos += cookie_name.length + 1;      //这里容易出问题，所以请大家参考的时候自己好好研究一下
+        var cookie_end = allcookies.indexOf(";",cookie_pos);
+  
+        if (cookie_end == -1)
+        {
+            cookie_end = allcookies.length;
+        }
+  
+        var value = allcookies.substring(cookie_pos, cookie_end);         //这里就可以得到你想要的cookie的值了。。。
+    }
+    return value;
+}
+function delCookie(name)
+{
+	var exp = new Date();
+	exp.setTime(exp.getTime() - 1);
+	var cval=getCookie(name);
+	if(cval!=null)
+	document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+}
+function show_form_info() //在页面最上方的表格里显示表单名字和真实名字
+{
+	if (getCookie("username")!=null)
+	{
+		// 调用函数getCookie,获取truthname的值
+		var cookie_val = getCookie("truthname");
+		//解码URL编码，并显示在<p id="truthname">中
+		document.getElementById("truthname").innerHTML=decodeURI(cookie_val);
+		if (getCookie("formname")!=null)
+		{
+			// 调用函数getCookie,获formname的值
+			var cookie_val = getCookie("formname");
+			//解码URL编码，并显示在<p id="formname">中
+			document.getElementById("formname").innerHTML=decodeURI(cookie_val);
+		}
+		else 
+		{ 	//如果记录正在操作的巡检表，则跳转console_panel登陆界面
+			alert("未知表单编号，请重新选择需要操作的表单");
+			window.location.href='../console_panel.html';
+		}
+	}
+	else 
+	{ 	//如果未登陆，则跳转至index登陆界面
+		alert("请先登陆");
+		window.location.href='../index.html';
+	}
+
+}
+function complete_input() //点击结束录入，进入查询界面
+{	
+		var con=confirm("确定完成所有数据录入");
+		if (con==true) 
+		{
+			window.location.href='../form_query_export.html'
+		}
+}
+function cancel_quit() //退出页面，删除cookie的formname，删除操作的表单记录
+{
+	delCookie("formname");
+	window.location.href='../console_panel.html'
+}
+</script>
+</head>
+<form action="/cgi-bin/qxl_comprehensive_submit.py" method="post">
+<body onload="show_form_info()">
+<table width="449" border="0" align="center">
+  <tr>
+    <td width="84">表单编号：</td>
+    <td width="137"><p id="formname"></p></td>
+    <td width="92">巡检人员：</td>
+    <td width="118"><p id="truthname"></p></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1" align="center">
+  <tr>
+    <td colspan="3"><div align="center">气象路机房温湿度</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">位置</div></td>
+    <td><div align="center">温度℃</div></td>
+    <td><div align="center">湿度%</div></td>
+  </tr>
+  <tr>
+    <td width="217"><div align="center">监控点1</div></td>
+    <td width="163"><div align="center">
+      <input name="qxl_tem1" type="text" id="qxl_tem1" size="7" maxlength="4" />
+    </div></td>
+    <td width="166"><div align="center">
+      <input name="qxl_hum1" type="text" id="qxl_hum1" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点2</div></td>
+    <td><div align="center">
+      <input name="qxl_tem2" type="text" id="qxl_tem2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_hum2" type="text" id="qxl_hum2" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点3</div></td>
+    <td><div align="center">
+      <input name="qxl_tem3" type="text" id="qxl_tem3" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_hum3" type="text" id="qxl_hum3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点4</div></td>
+    <td><div align="center">
+      <input name="qxl_tem4" type="text" id="qxl_tem4" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_hum4" type="text" id="qxl_hum4" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点5</div></td>
+    <td><div align="center">
+      <input name="qxl_tem5" type="text" id="qxl_tem5" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_hum5" type="text" id="qxl_hum5" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点6</div></td>
+    <td><div align="center">
+      <input name="qxl_tem6" type="text" id="qxl_tem6" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_hum6" type="text" id="qxl_hum6" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点7</div></td>
+    <td><div align="center">
+      <input name="qxl_tem7" type="text" id="qxl_tem7" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_hum7" type="text" id="qxl_hum7" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点8</div></td>
+    <td><div align="center">
+      <input name="qxl_tem8" type="text" id="qxl_tem8" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_hum8" type="text" id="qxl_hum8" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点9</div></td>
+    <td><div align="center">
+      <input name="qxl_tem9" type="text" id="qxl_tem9" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_hum9" type="text" id="qxl_hum9" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点10</div></td>
+    <td><div align="center">
+      <input name="qxl_tem10" type="text" id="qxl_tem10" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_hum10" type="text" id="qxl_hum10" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">备注</div></td>
+    <td colspan="2"><div align="center">
+      <textarea name="qxl_temandhum_des" cols="40" rows="5" id="qxl_temandhum_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1" align="center">
+  <tr>
+    <td colspan="6"><div align="center">气象路机房精密空调</div></td>
+  </tr>
+  <tr>
+    <td width="121"><div align="center">位置</div></td>
+    <td width="89"><div align="center">回风温度</div></td>
+    <td width="83"><div align="center">回风湿度</div></td>
+    <td width="78"><div align="center">开启状态</div></td>
+    <td width="79"><div align="center">空调状态</div></td>
+    <td width="78"><div align="center">异常噪音</div></td>
+  </tr>
+  <tr>
+    <td height="29"><div align="center">空调AC-1</div></td>
+    <td><div align="center">
+      <input name="qxl_ac_tem1" type="text" id="qxl_ac_tem1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ac_hum1" type="text" id="qxl_ac_hum1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="qxl_ac_open1" size="1" id="qxl_ac_open1">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="qxl_ac_state1" size="1" id="qxl_ac_state1">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="qxl_ac_voice1" size="1" id="qxl_ac_voice1">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-2</div></td>
+    <td><div align="center">
+      <input name="qxl_ac_tem2" type="text" id="qxl_ac_tem2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ac_hum2" type="text" id="qxl_ac_hum2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="qxl_ac_open2" size="1" id="qxl_ac_open2">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="qxl_ac_state2" size="1" id="qxl_ac_state2">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="qxl_ac_voice2" size="1" id="qxl_ac_voice2">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="23" colspan="2"><div align="center">备注</div><label for="qxl_aircondition_des"></label></td>
+    <td colspan="4"><div align="center">
+      <textarea name="qxl_aircondition_des" cols="40" rows="5" id="qxl_aircondition_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1" align="center">
+  <tr>
+    <td height="24" colspan="4"><div align="center">气象路机房环境</div></td>
+  </tr>
+  <tr>
+    <td width="218"><div align="center">45m漏水绳</div></td>
+    <td width="334" colspan="3"><div align="center">
+      <input name="qxl_leak_45m" type="radio" onclick="qxl_leak_45m_close()" value="0" checked="checked" />
+      正常
+      <input type="radio" name="qxl_leak_45m" value="1" onclick="qxl_leak_45m_open()"/>
+      漏水 漏点
+      <input name="qxl_leak_45m_spot" type="text" disabled="disabled" id="qxl_leak_45m_spot" size="8" maxlength="3" />
+      m</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">15m漏水绳</div></td>
+    <td colspan="3"><div align="center">
+      <input name="qxl_leak_15m" type="radio" onclick="qxl_leak_15m_close()" value="0" checked="checked" />
+      正常
+      <input type="radio" name="qxl_leak_15m" value="1" onclick="qxl_leak_15m_open()"/>
+      漏水 漏点
+      <input name="qxl_leak_15m_spot" type="text" disabled="disabled" id="qxl_leak_15m_spot" size="8" maxlength="3" />
+      m</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">门1</div></td>
+    <td colspan="3"><div align="center">
+      <select name="qxl_door1" size="1" id="qxl_door1">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">门2</div></td>
+    <td colspan="3"><div align="center">
+      <select name="qxl_door2" size="1" id="qxl_door2">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">门3</div></td>
+    <td colspan="3"><div align="center">
+      <select name="qxl_door3" size="1" id="qxl_door3">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">门4</div></td>
+    <td colspan="3"><div align="center">
+      <select name="qxl_door4" size="1" id="qxl_door4">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">入侵检测</div></td>
+    <td colspan="3"><div align="center">
+      <select name="qxl_defend_state" size="1" id="qxl_defend_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">备注</div></td>
+    <td colspan="3"><div align="center">
+      <textarea name="qxl_environment_des" cols="40" rows="5" id="qxl_environment_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1" align="center">
+  <tr>
+    <td colspan="5"><div align="center">气象路机房精密配电柜</div></td>
+  </tr>
+  <tr>
+    <td width="109" rowspan="7"><div align="center">1号精密配电柜</div></td>
+    <td width="103" rowspan="7"><div align="center">UPS1-P0201-A</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td width="118"><div align="center">Uab</div></td>
+    <td width="105"><div align="center">Ubc</div></td>
+    <td width="99"><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_pmm1_uab" type="text" id="qxl_pmm1_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_pmm1_ubc" type="text" id="qxl_pmm1_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_pmm1_uca" type="text" id="qxl_pmm1_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_pmm1_ia" type="text" id="qxl_pmm1_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_pmm1_ib" type="text" id="qxl_pmm1_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_pmm1_ic" type="text" id="qxl_pmm1_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">运行状态</div></td>
+    <td colspan="2"><div align="center">
+      <select name="qxl_pmm1_state" size="1" id="qxl_pmm1_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">2号精密配电柜</div></td>
+    <td rowspan="7"><div align="center">UPS2-P0201-B</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Uab</div></td>
+    <td><div align="center">Ubc</div></td>
+    <td><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_pmm2_uab" type="text" id="qxl_pmm2_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_pmm2_ubc" type="text" id="qxl_pmm2_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_pmm2_uca" type="text" id="qxl_pmm2_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_pmm2_ia" type="text" id="qxl_pmm2_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_pmm2_ib" type="text" id="qxl_pmm2_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_pmm2_ic" type="text" id="qxl_pmm2_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">运行状态</div></td>
+    <td colspan="2"><div align="center">
+      <select name="qxl_pmm2_state" size="1" id="qxl_pmm2_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="2"><div align="center">备注</div></td>
+    <td colspan="3"><div align="center">
+      <textarea name="qxl_pmm_des" cols="40" rows="5" id="qxl_pmm_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="570" border="1" align="center">
+  <tr>
+    <td colspan="5"><div align="center">气象路机房低压供电系统</div></td>
+  </tr>
+  <tr>
+    <td width="110" rowspan="7"><div align="center">1号电量仪</div></td>
+    <td width="105" rowspan="7"><div align="center">UPS输入1</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td width="118"><div align="center">Uab</div></td>
+    <td width="106"><div align="center">Ubc</div></td>
+    <td width="97"><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_cabinet1_uab" type="text" id="qxl_cabinet1_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet1_ubc" type="text" id="qxl_cabinet1_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet1_uca" type="text" id="qxl_cabinet1_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_cabinet1_ia" type="text" id="qxl_cabinet1_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet1_ib" type="text" id="qxl_cabinet1_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet1_ic" type="text" id="qxl_cabinet1_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select name="qxl_cabinet1_breaker_state" size="1" id="qxl_cabinet1_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">2号电量仪</div></td>
+    <td rowspan="7"><div align="center">UPS输出2</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td width="118"><div align="center">Uab</div></td>
+    <td width="106"><div align="center">Ubc</div></td>
+    <td width="97"><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_cabinet2_uab" type="text" id="qxl_cabinet2_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet2_ubc" type="text" id="qxl_cabinet2_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet2_uca" type="text" id="qxl_cabinet2_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_cabinet2_ia" type="text" id="qxl_cabinet2_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet2_ib" type="text" id="qxl_cabinet2_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet2_ic" type="text" id="qxl_cabinet2_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select name="qxl_cabinet2_breaker_state" size="1" id="qxl_cabinet2_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">3号电量仪</div></td>
+    <td rowspan="7"><div align="center">UPS输入1</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td width="118"><div align="center">Uab</div></td>
+    <td width="106"><div align="center">Ubc</div></td>
+    <td width="97"><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_cabinet3_uab" type="text" id="qxl_cabinet3_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet3_ubc" type="text" id="qxl_cabinet3_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet3_uca" type="text" id="qxl_cabinet3_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_cabinet3_ia" type="text" id="qxl_cabinet3_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet3_ib" type="text" id="qxl_cabinet3_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet3_ic" type="text" id="qxl_cabinet3_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select name="qxl_cabinet3_breaker_state" size="1" id="qxl_cabinet3_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">4号电量仪</div></td>
+    <td rowspan="7"><div align="center">UPS输入2</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Uab</div></td>
+    <td><div align="center">Ubc</div></td>
+    <td><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_cabinet4_uab" type="text" id="qxl_cabinet4_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet4_ubc" type="text" id="qxl_cabinet4_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet4_uca" type="text" id="qxl_cabinet4_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_cabinet4_ia" type="text" id="qxl_cabinet4_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet4_ib" type="text" id="qxl_cabinet4_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet4_ic" type="text" id="qxl_cabinet4_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select name="qxl_cabinet4_breaker_state" size="1" id="qxl_cabinet4_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="7"><div align="center">5号电量仪</div></td>
+    <td rowspan="7"><div align="center">总动力配电</div></td>
+    <td colspan="3"><div align="center">线电压(V)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Uab</div></td>
+    <td><div align="center">Ubc</div></td>
+    <td><div align="center">Uca</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_cabinet5_uab" type="text" id="qxl_cabinet5_uab" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet5_ubc" type="text" id="qxl_cabinet5_ubc" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet5_uca" type="text" id="qxl_cabinet5_uca" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流(A)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">Ia</div></td>
+    <td><div align="center">Ib</div></td>
+    <td><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_cabinet5_ia" type="text" id="qxl_cabinet5_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet5_ib" type="text" id="qxl_cabinet5_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_cabinet5_ic" type="text" id="qxl_cabinet5_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">断路器状态</div></td>
+    <td colspan="2"><div align="center">
+      <select name="qxl_cabinet5_breaker_state" size="1" id="qxl_cabinet5_breaker_state">
+        <option value="0">闭合</option>
+        <option value="1">断开</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="2"><div align="center">备注</div></td>
+    <td colspan="3"><div align="center">
+      <textarea name="qxl_cabinet_des" cols="40" rows="5" id="qxl_cabinet_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="569" border="1" align="center">
+  <tr>
+    <td colspan="4"><div align="center">气象路机房不间断电源</div></td>
+  </tr>
+  <tr>
+    <td width="222" rowspan="18"><div align="center">UPS1</div></td>
+    <td colspan="3"><div align="center">输入线电压</div></td>
+  </tr>
+  <tr>
+    <td width="116"><div align="center">L1-2</div></td>
+    <td width="108"><div align="center">L2-3</div></td>
+    <td width="95"><div align="center">L3-1</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_ups1_inu_l12" type="text" id="qxl_ups1_inu_l12" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups1_inu_l23" type="text" id="qxl_ups1_inu_l23" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups1_inu_l31" type="text" id="qxl_ups1_inu_l31" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_ups1_ini_l1" type="text" id="qxl_ups1_ini_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups1_ini_l2" type="text" id="qxl_ups1_ini_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups1_ini_l3" type="text" id="qxl_ups1_ini_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入有功功率(KW)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_ups1_inpower_l1" type="text" id="qxl_ups1_inpower_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups1_inpower_l2" type="text" id="qxl_ups1_inpower_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups1_inpower_l3" type="text" id="qxl_ups1_inpower_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输出线电压</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1-2</div></td>
+    <td><div align="center">L2-3</div></td>
+    <td><div align="center">L3-1</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_ups1_exu_l12" type="text" id="qxl_ups1_exu_l12" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups1_exu_l23" type="text" id="qxl_ups1_exu_l23" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups1_exu_l31" type="text" id="qxl_ups1_exu_l31" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输出电流</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_ups1_exi_l1" type="text" id="qxl_ups1_exi_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups1_exi_l2" type="text" id="qxl_ups1_exi_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups1_exi_l3" type="text" id="qxl_ups1_exi_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输出有功功率(KW)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_ups1_expower_l1" type="text" id="qxl_ups1_expower_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups1_expower_l2" type="text" id="qxl_ups1_expower_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups1_expower_l3" type="text" id="qxl_ups1_expower_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="18"><div align="center">UPS2</div></td>
+    <td colspan="3"><div align="center">输入线电压</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1-2</div></td>
+    <td><div align="center">L2-3</div></td>
+    <td><div align="center">L3-1</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_ups2_inu_l12" type="text" id="qxl_ups2_inu_l12" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups2_inu_l23" type="text" id="qxl_ups2_inu_l23" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups2_inu_l31" type="text" id="qxl_ups2_inu_l31" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入电流</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_ups2_ini_l1" type="text" id="qxl_ups2_ini_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups2_ini_l2" type="text" id="qxl_ups2_ini_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups2_ini_l3" type="text" id="qxl_ups2_ini_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输入有功功率(KW)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_ups2_inpower_l1" type="text" id="qxl_ups2_inpower_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups2_inpower_l2" type="text" id="qxl_ups2_inpower_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups2_inpower_l3" type="text" id="qxl_ups2_inpower_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输出线电压</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1-2</div></td>
+    <td><div align="center">L2-3</div></td>
+    <td><div align="center">L3-1</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_ups2_exu_l12" type="text" id="qxl_ups2_exu_l12" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups2_exu_l23" type="text" id="qxl_ups2_exu_l23" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups2_exu_l31" type="text" id="qxl_ups2_exu_l31" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输出电流</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_ups2_exi_l1" type="text" id="qxl_ups2_exi_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups2_exi_l2" type="text" id="qxl_ups2_exi_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups2_exi_l3" type="text" id="qxl_ups2_exi_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="3"><div align="center">输出有功功率(KW)</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">L1</div></td>
+    <td><div align="center">L2</div></td>
+    <td><div align="center">L3</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">
+      <input name="qxl_ups2_expower_l1" type="text" id="qxl_ups2_expower_l1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups2_expower_l2" type="text" id="qxl_ups2_expower_l2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="qxl_ups2_expower_l3" type="text" id="qxl_ups2_expower_l3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td rowspan="2"><div align="center">蓄电池</div></td>
+    <td colspan="2"><div align="center">UPS1电池组</div></td>
+    <td><div align="center">
+      <select name="qxl_ups1_battery_state" size="1" id="qxl_ups1_battery_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="2"><div align="center">UPS2电池组</div></td>
+    <td><div align="center">
+      <select name="qxl_ups2_battery_state" size="1" id="qxl_ups2_battery_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">备注</div></td>
+    <td colspan="3"><div align="center">
+      <textarea name="qxl_ups_des" cols="40" rows="5" id="qxl_ups_des"></textarea>
+    </div></td>
+  </tr>
+  <tr>
+    <td colspan="4">&nbsp;</td>
+  </tr>
+</table>
+</br>
+<table width="560" border="0" align="center">
+  <tr>
+    <td width="222">&nbsp;</td>
+    <td width="101"><input type="submit" name="qxl_comprehensive_submit_button" id="qxl_comprehensive_submit_button" value="保存" /></td>
+    <td width="125"><input type="button" value="结束录入" onclick="complete_input()"></td>
+    <td width="94"><input type="button" value="退出" onclick="cancel_quit()"></td>
+  </tr>
+</table>
+</form>
+</body>
+</html>

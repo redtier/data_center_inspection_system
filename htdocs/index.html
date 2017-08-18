@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>知识产权出版社中心机房巡检管理系统</title>
+<script>
+function getCookie(cookie_name) //该函数用来返回特定的Cookie
+{
+    var allcookies = document.cookie;
+    var cookie_pos = allcookies.indexOf(cookie_name);   //索引的长度
+  
+    // 如果找到了索引，就代表cookie存在，
+    // 反之，就说明不存在。
+    if (cookie_pos != -1)
+    {
+        // 把cookie_pos放在值的开始，只要给值加1即可。
+        cookie_pos += cookie_name.length + 1;      //这里容易出问题，所以请大家参考的时候自己好好研究一下
+        var cookie_end = allcookies.indexOf(";",cookie_pos);
+  
+        if (cookie_end == -1)
+        {
+            cookie_end = allcookies.length;
+        }
+  
+        var value = allcookies.substring(cookie_pos, cookie_end);         //这里就可以得到你想要的cookie的值了。。。
+    }
+    return value;
+}
+
+function delCookie(name)
+{
+	var exp = new Date();
+	exp.setTime(exp.getTime() - 1);
+	var cval=getCookie(name);
+	if(cval!=null)
+	document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+}
+
+function check_login() //查看用户是否已经登陆，如果登陆就跳转到console_panel界面
+{
+	if (getCookie("username")!=null)
+		{
+			delCookie("formname"); //如果有正在操作的formname在cookie里，删除该cookie
+			window.location.href='../console_panel.html';
+		}
+}
+</script>
+</head>
+
+<body onload="check_login()">
+<table width=100% height=100%>
+<tr>
+	<td><center>
+    <form action="/cgi-bin/index.py" method="post">
+      <p style="font-size:20px;color:black;font-family:century"><img src="picture/chubanshelogo.jpg" width="881" height="307" /></p>
+      <p style="font-size:20px;color:black;font-family:century">机房巡检记录系统</p>
+      <p style="font-size:20px;color:black;font-family:century">用户名：
+  <input type="text" name="username">      
+        密码：  <input type="password" name="password">
+      </p>
+      <p style="font-size:20px;color:black;font-family:century">    
+        <input type="submit" value="登录">
+        <input type="reset" value="重置">
+      </p>
+    </form>
+    </font></center></td>
+</tr></table>
+</body>
+</html>
+</body>
+</html>

@@ -1,0 +1,528 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" /> 
+<title>知识产权出版社中心机房巡检管理系统</title>
+<script src="js/laydate/laydate.js"></script>
+<script>
+function getCookie(cookie_name) //该函数用来返回特定的Cookie
+{
+    var allcookies = document.cookie;
+    var cookie_pos = allcookies.indexOf(cookie_name);   //索引的长度
+  
+    // 如果找到了索引，就代表cookie存在，
+    // 反之，就说明不存在。
+    if (cookie_pos != -1)
+    {
+        // 把cookie_pos放在值的开始，只要给值加1即可。
+        cookie_pos += cookie_name.length + 1;      //这里容易出问题，所以请大家参考的时候自己好好研究一下
+        var cookie_end = allcookies.indexOf(";",cookie_pos);
+  
+        if (cookie_end == -1)
+        {
+            cookie_end = allcookies.length;
+        }
+  
+        var value = allcookies.substring(cookie_pos, cookie_end);         //这里就可以得到你想要的cookie的值了。。。
+    }
+    return value;
+}
+function delCookie(name)
+{
+	var exp = new Date();
+	exp.setTime(exp.getTime() - 1);
+	var cval=getCookie(name);
+	if(cval!=null)
+	document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+}
+
+function show_cookies_truthname() //显示Cookie的truthname的值
+{
+	if (getCookie("username")!=null){
+		// 调用函数getCookie,获取truthname的值
+		var cookie_val = getCookie("truthname");
+		//解码URL编码，并显示在<p id="cookies_name">中
+		document.getElementById("cookies_name").innerHTML="欢迎登陆，"+decodeURI(cookie_val);
+		//回到console_panel时，如果cookie中保存着之前操作的巡检表formname，则将其从cookie中删除
+		/*delCookie("formname");
+		delCookie("recorder_username");
+		delCookie("audit_username");
+		delCookie("submit_state");
+		delCookie("audit_state");*/
+	}
+	else 
+	{ 	//如果未登陆，则跳转至index登陆界面
+		alert("请先登陆")
+		window.location.href='../index.html';
+	}
+
+}
+function cancel_quit() //注销登陆，并退回index.html
+{
+	delCookie("username");
+	delCookie("password");
+	delCookie("truthname");
+	delCookie("authorized");
+	delCookie("formname");
+	delCookie("recorder_username");
+	delCookie("audit_username");
+	delCookie("submit_state");
+	delCookie("audit_state");
+	window.location.href='../index.html';
+}
+function create_formname(ndate,ntime) //该函数用于将create_date和create_time的值合并成为新巡检记录表的名字形如20170404
+{	
+	var nyear_start=0;
+	var nyear_end=ndate.indexOf("-");
+	var nmonth_start=nyear_end+1;
+	var nmonth_end=ndate.indexOf("-",nmonth_start);
+	var nday_start=nmonth_end+1;
+	var nday_end=ndate.length;
+	var nyear=ndate.substring(nyear_start,nyear_end);
+	var nmonth=ndate.substring(nmonth_start,nmonth_end);
+	var nday=ndate.substring(nday_start,nday_end);
+	if (ntime<10)
+		ntime="0"+ntime;
+	var nformname=nyear+nmonth+nday+ntime;
+	return nformname;
+}
+function create_form() //点击新增记录按钮后，将巡检表日期和时间写入cookie，并跳转到f2_comprehensive_input.html开始录入
+{
+	var create_date=document.getElementById("create_date").value;
+	var create_time=document.getElementById("create_time").value;
+
+	if (create_date!="" && create_time!="null") //当日期和时间都选择了，才创建新巡检表
+	{
+		var new_formname=create_formname(create_date,create_time); //使用create_date和create_time生成新的巡检表名字
+		document.cookie="formname="+new_formname; //将新的巡检表的名字设置到cookie的formname，用于表示用户正在操作特定的巡检表
+		window.location.href='../cgi-bin/create_new_form.py'; //跳转到create_new_form.py，由后台判断该formname是否已经存在于数据库表form_record中。如果存在则跳转回console_panel，如果不存在则在数据库表form_record中插入该formname的条目,并跳转至f2_comprehensive_input进行录入。
+	}
+	else if (create_date=="") alert("请选择日期"); //如果没有选择日期，弹出提示对话框
+	else alert("请选择时间"); //如果没有选择时间，弹出提示对话框
+}
+function query_form() //点击查询按钮后，将巡检表日期和时间写入cookie，并跳转到form_query_export.html巡检表输出浏览界面
+{
+	var query_date=document.getElementById("query_date").value;
+	var query_time=document.getElementById("query_time").value;
+
+	if (query_date!="" && query_time!="null") //当日期和时间都选择了，才查询巡检表
+	{
+		var query_formname=create_formname(query_date,query_time); //使用query_date和query_time生成需要查询的巡检表名字
+		
+		//通过ajax将query_formname上传至后台check_formname.py判断该巡检表是否存在于数据库，如果存在则跳转至查询界面，如果不存在则弹出提醒对话框，query_formname如果存在于数据库check_formname返回字符串"true"，不存在check_formname则返回字符串"false"
+		
+		//定义要被ajax POST的字符串变量，字符串必须形如"name1=value1&name2=value2&name3=value3&...."，（不同赋值语句之间使用&隔开），该形式的字符串将被传到后端python cgi的form=cgi.FieldStorage()，python通过form.getvalue('name1')可获得对应的值'value1'
+		var postStr="query_formname="+query_formname;
+		
+		//开始初始化XMLHttpRequest对象
+		var xmlHttp;
+		try
+		{
+			//Firefox,Opera 8.0+ safari
+			xmlHttp = new XMLHttpRequest();
+		}
+		
+		catch(e)
+		{
+			//Inter Expplorer
+			try
+			{
+				xmlHttp = new ActiveXObject("Msxm12.XMLHTTP");
+			}
+			
+			catch(e)
+			{
+				try 
+				{
+					xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+				catch(e) 
+				{
+					alert("Your browser does not support AJAX!");
+					return false;
+				}
+			}
+		}
+		
+		//通过Post方式打开连接，将想要查询的巡检表名query_formname POST到/cgi-bin/check_formname.py
+		xmlHttp.open("POST","/cgi-bin/check_formname.py",true);
+		
+		//定义传输的文件HTTP头信息
+		xmlHttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		
+		//发送POST数据
+		xmlHttp.send(postStr);
+		
+		//获取执行状态
+		xmlHttp.onreadystatechange = function()
+		{
+			if(xmlHttp.readyState == 4 && xmlHttp.status == 200) //如果执行状态成功，那么就把返回信息赋值到变量，如果后台返回的信息是"true"则将查询的巡检表名query_formname写入cookie的formname的值，并跳转到巡检表输出浏览界面form_query_exprot.html，否则提示查询的巡检表不存在。
+			{	
+				//通过xmlHttp.responseText方法获得python cgi返回的值（JSON对象），并使用JSON.stringify将JSON对象转变为JSON字符串，形如"2017072402\r\n"。
+				var check_result=JSON.stringify(xmlHttp.responseText);
+				//去掉字符串的双引号，换行符\r\n，这里我们使用以下方法实现：只取该字符串第2个字符到倒数第6个字符
+				check_result=check_result.substring(1,check_result.length-5)
+				if (check_result=="true") //如果后台返回的信息是"true"
+				{
+					document.cookie="formname="+query_formname; //将查询的巡检表名query_formname写入cookie的formname的
+					window.location.href='../form_query_export.html'; //并跳转到巡检表输出浏览界面form_query_exprot.html
+				}
+				else alert("巡检表不存在，请重新输入"); //否则提示查询的巡检表不存在
+
+			}
+		}
+	}
+	else if (query_date=="") alert("请选择日期"); //如果没有选择日期，弹出提示对话框
+	else alert("请选择时间"); //如果没有选择时间，弹出提示对话框
+}
+function show_unsubmit_forms()
+{
+	//删除Select元show_unsubmit_forms下所有的option元素
+	document.getElementById('show_unsubmit_forms').options.length=0;
+	
+	//开始初始化XMLHttpRequest对象
+		var xmlHttp;
+		try
+		{
+			//Firefox,Opera 8.0+ safari
+			xmlHttp = new XMLHttpRequest();
+		}
+		
+		catch(e)
+		{
+			//Inter Expplorer
+			try
+			{
+				xmlHttp = new ActiveXObject("Msxm12.XMLHTTP");
+			}
+			
+			catch(e)
+			{
+				try 
+				{
+					xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+				catch(e) 
+				{
+					alert("Your browser does not support AJAX!");
+					return false;
+				}
+			}
+		}
+		
+		//通过Post方式打开连接，向/cgi-show_unsubmit_forms.py请求提交但未审核名单列表
+		xmlHttp.open("POST","/cgi-bin/show_unsubmit_forms.py",true);
+		
+		//定义传输的文件HTTP头信息
+		xmlHttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		
+		//发送POST请求
+		xmlHttp.send();
+		
+		//获取执行状态
+		xmlHttp.onreadystatechange = function()
+		{
+			if(xmlHttp.readyState == 4 && xmlHttp.status == 200) 
+			{	
+				//通过xmlHttp.responseText方法获得python cgi返回的值（JSON对象），并使用JSON.parse解析JSON对象，形成2元列表。
+				var unsubmit_forms_list=JSON.parse(xmlHttp.responseText);
+				
+				//如果"显示我的巡检记录"没有勾选，则逐条显示所有未提交的巡检表
+				if (document.getElementById("show_own_unsubmit_forms_tag").checked==false)
+				{	
+					var isnull_tag=0; //设定一个tag，初始值为0,当存在未提交的巡检记录表则变为1
+					for (var i=0;i<unsubmit_forms_list.length;i++)
+					{
+						var option = null;
+						var first = document.getElementById("show_unsubmit_forms");
+						option = document.createElement("option");
+						option.appendChild(document.createTextNode(unsubmit_forms_list[i][0]));
+						option.vaule = unsubmit_forms_list[i][0];
+						first.appendChild(option);
+						isnull_tag=1; //存在未提交的巡检记录表，tag设为1
+					}
+					if (isnull_tag==0) alert("没有未提交的巡检表"); //如果tag始终为0，说明不存在未提交的巡检记录
+				}
+				else//如果"显示我的巡检记录"勾选，则逐条显示formname的recorder_name等于cookie的username的值，即巡检表的巡检人是登录人的巡检表。
+				{	var isnull_tag=0;//设定一个tag，初始值为0,当存在未提交的巡检记录表则变为1
+					for (var i=0;i<unsubmit_forms_list.length;i++)
+					{
+						if (unsubmit_forms_list[i][1]==getCookie("username"))
+						{
+							var option = null;
+							var first = document.getElementById("show_unsubmit_forms");
+							option = document.createElement("option");
+							option.appendChild(document.createTextNode(unsubmit_forms_list[i][0]));
+							option.vaule = unsubmit_forms_list[i][0];
+							first.appendChild(option);
+							isnull_tag=1;//存在未提交的巡检记录表，tag设为1
+						}
+					}
+					if (isnull_tag==0) alert("您没有未提交的巡检表");//如果tag始终为0，说明不存在未提交的巡检记录
+				}
+
+			}
+		}
+}
+function submit_form()
+{
+	var submit_formname=document.getElementById("show_unsubmit_forms").value;//获取Select元素show_unsubmit_forms选定的option的值，即需要提交的巡检表的formname
+	if (submit_formname!="") //如果选择了Select中的option则将cookie的formname值改为option的值，即需要提交审核的巡检表的formname，并跳转到查询界面form_query_export.html，否则提示"请选择需要提交的巡检表"
+		{
+			document.cookie="formname="+submit_formname;
+			window.location.href='../form_query_export.html';
+		}
+		else alert("请选择需要提交的巡检表")
+}
+
+function show_submit_unaudit_forms()
+{
+	//删除Select元素show_submit_unaudit_forms下所有的option元素
+	document.getElementById('show_submit_unaudit_forms').options.length=0;
+	
+	//开始初始化XMLHttpRequest对象
+		var xmlHttp;
+		try
+		{
+			//Firefox,Opera 8.0+ safari
+			xmlHttp = new XMLHttpRequest();
+		}
+		
+		catch(e)
+		{
+			//Inter Expplorer
+			try
+			{
+				xmlHttp = new ActiveXObject("Msxm12.XMLHTTP");
+			}
+			
+			catch(e)
+			{
+				try 
+				{
+					xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+				}
+				catch(e) 
+				{
+					alert("Your browser does not support AJAX!");
+					return false;
+				}
+			}
+		}
+		
+		//通过Post方式打开连接，向/cgi-bin/show_submit_unaudit_forms.py请求提交但未审核名单列表
+		xmlHttp.open("POST","/cgi-bin/show_submit_unaudit_forms.py",true);
+		
+		//定义传输的文件HTTP头信息
+		xmlHttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		
+		//发送POST请求
+		xmlHttp.send();
+		
+		//获取执行状态
+		xmlHttp.onreadystatechange = function()
+		{
+			if(xmlHttp.readyState == 4 && xmlHttp.status == 200) 
+			{	
+				//通过xmlHttp.responseText方法获得python cgi返回的值（JSON对象），并使用JSON.parse解析JSON对象，形成2元列表。
+				var submit_unaudit_forms_list=JSON.parse(xmlHttp.responseText);
+				if (submit_unaudit_forms_list.length!=0)
+				{
+					for (var i=0;i<submit_unaudit_forms_list.length;i++)
+					{
+						//遍历获取到提交但未审核的巡检表的2元列表，在Select元素show_submit_unaudit_forms增加option元素(formname)
+						var option = null;
+						var first = document.getElementById("show_submit_unaudit_forms");
+						option = document.createElement("option");
+						option.appendChild(document.createTextNode(submit_unaudit_forms_list[i][0]));
+						option.vaule = submit_unaudit_forms_list[i][0];
+						first.appendChild(option);
+					}
+				}
+				else alert("没有未审核的巡检表");
+			}
+		}
+}
+function audit_form()
+{
+	var audit_formname=document.getElementById("show_submit_unaudit_forms").value;//获取Select元素show_submit_unaudit_forms选定的option的值，即需要审核的巡检表的formname
+	if (getCookie("authorized")=="1") //如果cookie的authorized权限的值为"1"，表示管理员权限，可以审核，否则提示"您没有审核的权限"
+	{
+		if (audit_formname!="") //如果选择了Select中的option则将cookie的formname值改为option的值，，即需要审核的巡检表的formname，并跳转到审核界面audit_form.html，否则提示"请选择需要审核的巡检表"
+		{
+			document.cookie="formname="+audit_formname;
+			window.location.href='../audit_form.html';
+		}
+		else alert("请选择需要审核的巡检表")
+	}
+	else alert("您没有审核的权限");
+}
+
+</script>
+</head>
+<body onload="show_cookies_truthname()">
+<table width="225" border="0" align="center">
+  <tr>
+    <td width="142"><p id="cookies_name">用户未登陆</p></td>
+    <td width="73"><div align="left">
+      <input type="button" name="cancel_login" id="cancel_login" value="注销登陆" onclick="cancel_quit()"/>
+    </div></td>
+  </tr>
+</table>
+<table width=100% height=100% align="center">
+<tr>
+	<td><center>
+
+    <table width="786" border="0">
+      <tr>
+        <td colspan="5"></td>
+        </tr>
+      <tr>
+        <td colspan="5">&nbsp;</td>
+        </tr>
+      <tr>
+        <td width="225"><div align="right">新增巡检记录表</div></td>
+        <td colspan="4">&nbsp;</td>
+        </tr>
+      <tr>
+        <td><div align="right">选择日期</div></td>
+        <td width="168">
+        <input placeholder="请输入日期" class="laydate-icon" name="create_date" id="create_date" onclick="laydate()"/></td>
+        <td width="80">选择时间</td>
+        <td width="82"><select name="create_time" size="1" id="create_time">
+            <option value="null"> </option>
+            <option value="2">2时</option>
+            <option value="5">5时</option>
+            <option value="8">8时</option>
+            <option value="11">11时</option>
+            <option value="14">14时</option>
+            <option value="17">17时</option>
+            <option value="20">20时</option>
+            <option value="23">23时</option>
+        </select></td>
+        <td width="209"><div align="left">
+          <input type="button" name="create_form" id="create_form" value="新增巡检记录" onclick="create_form()"/>
+        </div></td>
+      </tr>
+      <tr>
+        <td colspan="5">&nbsp;</td>
+        </tr>
+      <tr>
+        <td colspan="5">&nbsp;</td>
+      </tr>
+      <tr>
+        <td><div align="right">查询巡检记录表</div></td>
+        <td colspan="4">&nbsp;</td>
+        </tr>
+      <tr>
+        <td><div align="right">选择日期</div></td>
+        <td><input placeholder="请输入日期" class="laydate-icon" name="query_date" id="query_date"onclick="laydate()"/></td>
+        <td>选择时间</td>
+        <td><select name="query_time" size="1" id="query_time">
+          <option value="null"></option>
+          <option value="2">2时</option>
+          <option value="5">5时</option>
+          <option value="8">8时</option>
+          <option value="11">11时</option>
+          <option value="14">14时</option>
+          <option value="17">17时</option>
+          <option value="20">20时</option>
+          <option value="23">23时</option>
+        </select></td>
+        <td><input type="button" name="query_form" id="query_form" value="查询巡检记录" onclick="query_form()"/></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><div align="right">提交巡检记录表</div></td>
+        <td><div align="left">
+          <input type="button" name="show_unsubmit_forms_button" id="show_unsubmit_forms_button" value="显示未提交巡检记录" onclick="show_unsubmit_forms()"/>
+        </div></td>
+        <td colspan="2"><input name="show_own_unsubmit_forms_tag" type="checkbox" id="show_own_unsubmit_forms_tag" onclick="show_unsubmit_forms()"/> 
+          显示我的巡检记录</td>
+        <td><input type="button" name="submit_form_button" id="submit_form_button" value="查看巡检记录" onclick="submit_form()"/></td>
+      </tr>
+      <tr>
+        <td height="21">&nbsp;</td>
+        <td colspan="3" rowspan="4"><div align="left">
+          <select style="width:200px" name="show_unsubmit_forms" size="5" id="show_unsubmit_forms">
+          </select>
+        </div></td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td><div align="right">审核巡检记录表</div></td>
+        <td><div align="left">
+          <input type="button" name="show_submit_unaudit_forms_button" id="show_submit_unaudit_forms_button" value="显示未审核巡检记录" onclick="show_submit_unaudit_forms()"/>
+        </div></td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td><input type="button" name="audit_form_button" id="audit_form_button" value="审核巡检记录" onclick="audit_form()"/></td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td colspan="3" rowspan="4"><div align="left">
+          <select style="width:200px" name="show_submit_unaudit_forms" size="5" id="show_submit_unaudit_forms">
+          </select>
+        </div></td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      </table>
+    </font>
+	</center></td>
+</tr></table>
+</body>
+</html>
+</body>
+</html>

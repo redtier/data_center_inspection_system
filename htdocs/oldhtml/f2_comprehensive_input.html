@@ -1,0 +1,1483 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />  
+<title>2楼机房温湿度</title>
+<script>
+function f2_leak_ac_close()
+{
+	document.getElementById("f2_leak_ac_spot").disabled=true
+}
+function f2_leak_ac_open()
+{
+	document.getElementById("f2_leak_ac_spot").disabled=false
+}
+function f2_leak_corridor_close()
+{
+	document.getElementById("f2_leak_corridor_spot").disabled=true
+}
+function f2_leak_corridor_open()
+{
+	document.getElementById("f2_leak_corridor_spot").disabled=false
+}
+function getCookie(cookie_name) //该函数用来返回特定的Cookie
+{
+    var allcookies = document.cookie;
+    var cookie_pos = allcookies.indexOf(cookie_name);   //索引的长度
+  
+    // 如果找到了索引，就代表cookie存在，
+    // 反之，就说明不存在。
+    if (cookie_pos != -1)
+    {
+        // 把cookie_pos放在值的开始，只要给值加1即可。
+        cookie_pos += cookie_name.length + 1;      //这里容易出问题，所以请大家参考的时候自己好好研究一下
+        var cookie_end = allcookies.indexOf(";",cookie_pos);
+  
+        if (cookie_end == -1)
+        {
+            cookie_end = allcookies.length;
+        }
+  
+        var value = allcookies.substring(cookie_pos, cookie_end);         //这里就可以得到你想要的cookie的值了。。。
+    }
+    return value;
+}
+function delCookie(name)
+{
+	var exp = new Date();
+	exp.setTime(exp.getTime() - 1);
+	var cval=getCookie(name);
+	if(cval!=null)
+	document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+}
+function show_form_info() //在页面最上方的表格里显示表单名字和真实名字
+{
+	if (getCookie("username")!=null)
+	{
+		// 调用函数getCookie,获取truthname的值
+		var cookie_val = getCookie("truthname");
+		//解码URL编码，并显示在<p id="truthname">中
+		document.getElementById("truthname").innerHTML=decodeURI(cookie_val);
+		if (getCookie("formname")!=null)
+		{
+			// 调用函数getCookie,获formname的值
+			var cookie_val = getCookie("formname");
+			//解码URL编码，并显示在<p id="formname">中
+			document.getElementById("formname").innerHTML=decodeURI(cookie_val);
+		}
+		else 
+		{ 	//如果记录正在操作的巡检表，则跳转console_panel登陆界面
+			alert("未知表单编号，请重新选择需要操作的表单");
+			window.location.href='../console_panel.html';
+		}
+	}
+	else 
+	{ 	//如果未登陆，则跳转至index登陆界面
+		alert("请先登陆");
+		window.location.href='../index.html';
+	}
+
+}
+function next_step() //点击下一步，进入负1楼数据录入
+{	
+		var con=confirm("确定完成2楼机房数据录入，跳转到负1楼数据录入");
+		if (con==true) 
+		{	
+			window.location.href='../b1_comprehensive_input.html';
+		}
+}
+
+function cancel_quit() //退出页面，删除cookie的formname，删除操作的表单记录
+{	
+		var con=confirm("确定要退出新增巡检表"+getCookie("formname"));
+		if (con==true) 
+		{
+			delCookie("formname");
+			window.location.href='../console_panel.html'
+		}
+}
+</script>
+</head>
+<form action="/cgi-bin/f2_comprehensive_submit.py" method="post">
+<body onload="show_form_info()">
+<table width="449" border="0"  align="center">
+  <tr>
+    <td width="84">表单编号：</td>
+    <td width="137"><p id="formname"></p></td>
+    <td width="92">巡检人员：</td>
+    <td width="118"><p id="truthname"></p></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1" align="center">
+  <tr>
+    <td colspan="3"><div align="center">2楼机房环境 温湿度</div></td>
+  </tr>
+  <tr>
+    <td width="217"><div align="center">位置</div></td>
+    <td width="163"><div align="center">温度℃</div></td>
+    <td width="166"><div align="center">湿度%</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点1</div></td>
+    <td><div align="center">
+      <input name="f2_tem1" type="text" id="f2_tem1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum1" type="text" id="f2_hum1" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点2</div></td>
+    <td><div align="center">
+      <input name="f2_tem2" type="text" id="f2_tem2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum2" type="text" id="f2_hum2" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点3</div></td>
+    <td><div align="center">
+      <input name="f2_tem3" type="text" id="f2_tem3" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum3" type="text" id="f2_hum3" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点4</div></td>
+    <td><div align="center">
+      <input name="f2_tem4" type="text" id="f2_tem4" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum4" type="text" id="f2_hum4" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点5</div></td>
+    <td><div align="center">
+      <input name="f2_tem5" type="text" id="f2_tem5" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum5" type="text" id="f2_hum5" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点6</div></td>
+    <td><div align="center">
+      <input name="f2_tem6" type="text" id="f2_tem6" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum6" type="text" id="f2_hum6" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点7</div></td>
+    <td><div align="center">
+      <input name="f2_tem7" type="text" id="f2_tem7" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum7" type="text" id="f2_hum7" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点8</div></td>
+    <td><div align="center">
+      <input name="f2_tem8" type="text" id="f2_tem8" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum8" type="text" id="f2_hum8" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点9</div></td>
+    <td><div align="center">
+      <input name="f2_tem9" type="text" id="f2_tem9" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum9" type="text" id="f2_hum9" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点10</div></td>
+    <td><div align="center">
+      <input name="f2_tem10" type="text" id="f2_tem10" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum10" type="text" id="f2_hum10" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点11</div></td>
+    <td><div align="center">
+      <input name="f2_tem11" type="text" id="f2_tem11" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum11" type="text" id="f2_hum11" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点12</div></td>
+    <td><div align="center">
+      <input name="f2_tem12" type="text" id="f2_tem12" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum12" type="text" id="f2_hum12" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点13</div></td>
+    <td><div align="center">
+      <input name="f2_tem13" type="text" id="f2_tem13" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum13" type="text" id="f2_hum13" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点14</div></td>
+    <td><div align="center">
+      <input name="f2_tem14" type="text" id="f2_tem14" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum14" type="text" id="f2_hum14" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点15</div></td>
+    <td><div align="center">
+      <input name="f2_tem15" type="text" id="f2_tem15" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum15" type="text" id="f2_hum15" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点16</div></td>
+    <td><div align="center">
+      <input name="f2_tem16" type="text" id="f2_tem16" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum16" type="text" id="f2_hum16" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点17</div></td>
+    <td><div align="center">
+      <input name="f2_tem17" type="text" id="f2_tem17" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum17" type="text" id="f2_hum17" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点18</div></td>
+    <td><div align="center">
+      <input name="f2_tem18" type="text" id="f2_tem18" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum18" type="text" id="f2_hum18" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点19</div></td>
+    <td><div align="center">
+      <input name="f2_tem19" type="text" id="f2_tem19" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum19" type="text" id="f2_hum19" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点20</div></td>
+    <td><div align="center">
+      <input name="f2_tem20" type="text" id="f2_tem20" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum20" type="text" id="f2_hum20" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点21</div></td>
+    <td><div align="center">
+      <input name="f2_tem21" type="text" id="f2_tem21" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum21" type="text" id="f2_hum21" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点22</div></td>
+    <td><div align="center">
+      <input name="f2_tem22" type="text" id="f2_tem22" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum22" type="text" id="f2_hum22" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点23</div></td>
+    <td><div align="center">
+      <input name="f2_tem23" type="text" id="f2_tem23" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum23" type="text" id="f2_hum23" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点24</div></td>
+    <td><div align="center">
+      <input name="f2_tem24" type="text" id="f2_tem24" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum24" type="text" id="f2_hum24" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点25</div></td>
+    <td><div align="center">
+      <input name="f2_tem25" type="text" id="f2_tem25" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum25" type="text" id="f2_hum25" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点26</div></td>
+    <td><div align="center">
+      <input name="f2_tem26" type="text" id="f2_tem26" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum26" type="text" id="f2_hum26" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点27</div></td>
+    <td><div align="center">
+      <input name="f2_tem27" type="text" id="f2_tem27" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum27" type="text" id="f2_hum27" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点28</div></td>
+    <td><div align="center">
+      <input name="f2_tem28" type="text" id="f2_tem28" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum28" type="text" id="f2_hum28" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点29</div></td>
+    <td><div align="center">
+      <input name="f2_tem29" type="text" id="f2_tem29" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum29" type="text" id="f2_hum29" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控点30</div></td>
+    <td><div align="center">
+      <input name="f2_tem30" type="text" id="f2_tem30" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum30" type="text" id="f2_hum30" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td height="25"><div align="center">监控点31</div></td>
+    <td><div align="center">
+      <input name="f2_tem31" type="text" id="f2_tem31" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="f2_hum31" type="text" id="f2_hum31" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">备注</div></td>
+    <td colspan="2"><div align="center">
+      <textarea name="f2_temandhum_des" cols="40" rows="5" id="f2_temandhum_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1"  align="center">
+  <tr>
+    <td colspan="6"><div align="center">2楼机房精密空调</div></td>
+  </tr>
+  <tr>
+    <td width="140"><div align="center">位置</div></td>
+    <td width="72"><div align="center">回风温度</div></td>
+    <td width="74"><div align="center">回风湿度</div></td>
+    <td width="82"><div align="center">开启状态</div></td>
+    <td width="78"><div align="center">空调状态</div></td>
+    <td width="82"><div align="center">异常噪音</div></td>
+  </tr>
+  <tr>
+    <td height="29"><div align="center">空调AC-1</div></td>
+    <td><div align="center">
+        <input name="ac_tem1" type="text" id="ac_tem1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+        <input name="ac_hum1" type="text" id="ac_hum1" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="ac_open1" size="1" id="ac_open1">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+      <label for="ac_open1"></label>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_state1" size="1" id="ac_state1">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_voice1" size="1" id="ac_voice1">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-2</div></td>
+    <td><div align="center">
+      <input name="ac_tem2" type="text" id="ac_tem2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="ac_hum2" type="text" id="ac_hum2" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="ac_open2" size="1" id="ac_open2">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_state2" size="1" id="ac_state2">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_voice2" size="1" id="ac_voice2">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-3</div></td>
+    <td><div align="center">
+        <input name="ac_tem3" type="text" id="ac_tem3" size="7" maxlength="4" />
+      </div>
+    </label></td>
+    <td><div align="center">
+        <input name="ac_hum3" type="text" id="ac_hum3" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="ac_open3" size="1" id="ac_open3">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <div align="center">
+        <select name="ac_state3" size="1" id="ac_state3">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+      </div>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_voice3" size="1" id="ac_voice3">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-4</div></td>
+    <td><div align="center">
+      <input name="ac_tem4" type="text" id="ac_tem4" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="ac_hum4" type="text" id="ac_hum4" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="ac_open4" size="1" id="ac_open4">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_state4" size="1" id="ac_state4">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_voice4" size="1" id="ac_voice4">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-5</div></td>
+    <td><div align="center">
+        <input name="ac_tem5" type="text" id="ac_tem5" size="7" maxlength="4" />
+      </div>
+    </label></td>
+    <td><div align="center">
+        <input name="ac_hum5" type="text" id="ac_hum5" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="ac_open5" size="1" id="ac_open5">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <div align="center">
+        <select name="ac_state5" size="1" id="ac_state5">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+      </div>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_voice5" size="1" id="ac_voice5">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-6</div></td>
+    <td><div align="center">
+      <input name="ac_tem6" type="text" id="ac_tem6" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="ac_hum6" type="text" id="ac_hum6" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="ac_open6" size="1" id="ac_open6">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_state6" size="1" id="ac_state6">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_voice6" size="1" id="ac_voice6">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-7</div></td>
+    <td><div align="center">
+        <input name="ac_tem7" type="text" id="ac_tem7" size="7" maxlength="4" />
+      </div>
+    </label></td>
+    <td><div align="center">
+        <input name="ac_hum7" type="text" id="ac_hum7" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="ac_open7" size="1" id="ac_open7">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <div align="center">
+        <select name="ac_state7" size="1" id="ac_state7">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+      </div>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_voice7" size="1" id="ac_voice7">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-8</div></td>
+    <td><div align="center">
+      <input name="ac_tem8" type="text" id="ac_tem8" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="ac_hum8" type="text" id="ac_hum8" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="ac_open8" size="1" id="ac_open8">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_state8" size="1" id="ac_state8">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_voice8" size="1" id="ac_voice8">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-9</div></td>
+    <td><div align="center">
+        <input name="ac_tem9" type="text" id="ac_tem9" size="7" maxlength="4" />
+      </div>
+    </td>
+    <td><div align="center">
+        <input name="ac_hum9" type="text" id="ac_hum9" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="ac_open9" size="1" id="ac_open9">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <div align="center">
+        <select name="ac_state9" size="1" id="ac_state9">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+      </div>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_voice9" size="1" id="ac_voice9">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-10</div></td>
+    <td><div align="center">
+      <input name="ac_tem10" type="text" id="ac_tem10" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="ac_hum10" type="text" id="ac_hum10" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="ac_open10" size="1" id="ac_open10">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_state10" size="1" id="ac_state10">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_voice10" size="1" id="ac_voice10">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-11</div></td>
+    <td><div align="center">
+        <input name="ac_tem11" type="text" id="ac_tem11" size="7" maxlength="4" />
+      </div>
+    </label></td>
+    <td><div align="center">
+        <input name="ac_hum11" type="text" id="ac_hum11" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="ac_open11" size="1" id="ac_open11">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_state11" size="1" id="ac_state11">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_voice11" size="1" id="ac_voice11">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调AC-12</div></td>
+    <td><div align="center">
+      <input name="ac_tem12" type="text" id="ac_tem12" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="ac_hum12" type="text" id="ac_hum12" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="ac_open12" size="1" id="ac_open12">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_state12" size="1" id="ac_state12">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_voice12" size="1" id="ac_voice12">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="23"><div align="center">空调AC-13</div></td>
+    <td><div align="center">
+        <input name="ac_tem13" type="text" id="ac_tem13" size="7" maxlength="4" />
+      </div>
+    </label></td>
+    <td><div align="center">
+        <input name="ac_hum13" type="text" id="ac_hum13" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <select name="ac_open13" size="1" id="ac_open13">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <div align="center">
+        <select name="ac_state13" size="1" id="ac_state13">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+      </div>
+    </div></td>
+    <td><div align="center">
+      <select name="ac_voice13" size="1" id="ac_voice13">
+        <option value="0">无</option>
+        <option value="1">有</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="23" colspan="2"><div align="center">备注</div></td>
+    <td colspan="4"><div align="center">
+      <textarea name="f2_aircondition_des" cols="40" rows="5" id="f2_aircondition_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1"  align="center">
+  <tr>
+    <td colspan="6"><div align="center">2楼机房强电列头柜</div></td>
+  </tr>
+  <tr>
+    <td width="112" rowspan="2"><div align="center">位置</div></td>
+    <td width="93" rowspan="2"><div align="center">运行状态</div></td>
+    <td width="85" rowspan="2"><div align="center">电压(V)</div></td>
+    <td colspan="3"><div align="center">电流(A)</div></td>
+  </tr>
+  <tr>
+    <td width="80"><div align="center">Ia</div></td>
+    <td width="82"><div align="center">Ib</div></td>
+    <td width="76"><div align="center">Ic</div></td>
+  </tr>
+  <tr>
+    <td height="29"><div align="center">P1101A</div></td>
+    <td><div align="center">
+        <select name="P1101A_state" size="1" id="P1101A_state">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+    </div></td>
+    <td><div align="center">
+        <input name="P1101A_voltage" type="text" id="P1101A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P1101A_ia" type="text" id="P1101A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P1101A_ib" type="text" id="P1101A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P1101A_ic" type="text" id="P1101A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P1101B</div></td>
+    <td><div align="center">
+      <select name="P1101B_state" size="1" id="P1101B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input name="P1101B_voltage" type="text" id="P1101B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P1101B_ia" type="text" id="P1101B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P1101B_ib" type="text" id="P1101B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P1101B_ic" type="text" id="P1101B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P1001B</div></td>
+    <td><div align="center">
+      <select name="P1001B_state" size="1" id="P1001B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input name="P1001B_voltage" type="text" id="P1001B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P1001B_ia" type="text" id="P1001B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P1001B_ib" type="text" id="P1001B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P1001B_ic" type="text" id="P1001B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P1001A</div></td>
+    <td><div align="center">
+        <select name="P1001A_state" size="1" id="P1001A_state">
+          <option value="0">正常</option>
+          <option value="1">异常</option>
+        </select>
+    </div></td>
+    <td><div align="center">
+        <input name="P1001A_voltage" type="text" id="P1001A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P1001A_ia" type="text" id="P1001A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P1001A_ib" type="text" id="P1001A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P1001A_ic" type="text" id="P1001A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0901A</div></td>
+    <td><div align="center">
+      <select name="P0901A_state" size="1" id="P0901A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+        <input name="P0901A_voltage" type="text" id="P0901A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0901A_ia" type="text" id="P0901A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0901A_ib" type="text" id="P0901A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0901A_ic" type="text" id="P0901A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0901B</div></td>
+    <td><div align="center">
+      <select name="P0901B_state" size="1" id="P0901B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input name="P0901B_voltage" type="text" id="P0901B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0901B_ia" type="text" id="P0901B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0901B_ib" type="text" id="P0901B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0901B_ic" type="text" id="P0901B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0801B</div></td>
+    <td><div align="center">
+      <select name="P0801B_state" size="1" id="P0801B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input name="P0801B_voltage" type="text" id="P0801B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0801B_ia" type="text" id="P0801B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0801B_ib" type="text" id="P0801B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0801B_ic" type="text" id="P0801B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0801A</div></td>
+    <td><div align="center">
+      <select name="P0801A_state" size="1" id="P0801A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+        <input name="P0801A_voltage" type="text" id="P0801A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0801A_ia" type="text" id="P0801A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0801A_ib" type="text" id="P0801A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0801A_ic" type="text" id="P0801A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0701A</div></td>
+    <td><div align="center">
+      <select name="P0701A_state" size="1" id="P0701A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+        <input name="P0701A_voltage" type="text" id="P0701A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0701A_ia" type="text" id="P0701A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0701A_ib" type="text" id="P0701A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0701A_ic" type="text" id="P0701A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0701B</div></td>
+    <td><div align="center">
+      <select name="P0701B_state" size="1" id="P0701B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input name="P0701B_voltage" type="text" id="P0701B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0701B_ia" type="text" id="P0701B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0701B_ib" type="text" id="P0701B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0701B_ic" type="text" id="P0701B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0601B</div></td>
+    <td><div align="center">
+      <select name="P0601B_state" size="1" id="P0601B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input name="P0601B_voltage" type="text" id="P0601B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0601B_ia" type="text" id="P0601B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0601B_ib" type="text" id="P0601B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0601B_ic" type="text" id="P0601B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0601A</div></td>
+    <td><div align="center">
+      <select name="P0601A_state" size="1" id="P0601A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+        <input name="P0601A_voltage" type="text" id="P0601A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0601A_ia" type="text" id="P0601A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0601A_ib" type="text" id="P0601A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0601A_ic" type="text" id="P0601A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">P0501A</div></td>
+    <td><div align="center">
+      <select name="P0501A_state" size="1" id="P0501A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input name="P0501A_voltage" type="text" id="P0501A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0501A_ia" type="text" id="P0501A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0501A_ib" type="text" id="P0501A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0501A_ic" type="text" id="P0501A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0501B</div></td>
+    <td><div align="center">
+      <select name="P0501B_state" size="1" id="P0501B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input name="P0501B_voltage" type="text" id="P0501B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0501B_ia" type="text" id="P0501B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0501B_ib" type="text" id="P0501B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0501B_ic" type="text" id="P0501B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0401B</div></td>
+    <td><div align="center">
+      <select name="P0401B_state" size="1" id="P0401B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input name="P0401B_voltage" type="text" id="P0401B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0401B_ia" type="text" id="P0401B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0401B_ib" type="text" id="P0401B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0401B_ic" type="text" id="P0401B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td height="33"><div align="center">P0401A</div></td>
+    <td><div align="center">
+      <select name="P0401A_state" size="1" id="P0401A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input name="P0401A_voltage" type="text" id="P0401A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0401A_ia" type="text" id="P0401A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0401A_ib" type="text" id="P0401A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0401A_ic" type="text" id="P0401A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td height="32"><div align="center">P0301A</div></td>
+    <td><div align="center">
+      <select name="P0301A_state" size="1" id="P0301A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input name="P0301A_voltage" type="text" id="P0301A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0301A_ia" type="text" id="P0301A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0301A_ib" type="text" id="P0301A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0301A_ic" type="text" id="P0301A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0301B</div></td>
+    <td><div align="center">
+      <select name="P0301B_state" size="1" id="P0301B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input name="P0301B_voltage" type="text" id="P0301B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0301B_ia" type="text" id="P0301B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0301B_ib" type="text" id="P0301B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0301B_ic" type="text" id="P0301B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td height="31"><div align="center">P0101A</div></td>
+    <td><div align="center">
+      <select name="P0101A_state" size="1" id="P0101A_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input name="P0101A_voltage" type="text" id="P0101A_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0101A_ia" type="text" id="P0101A_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0101A_ib" type="text" id="P0101A_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0101A_ic" type="text" id="P0101A_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">P0101B</div></td>
+    <td><div align="center">
+      <select name="P0101B_state" size="1" id="P0101B_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+      </select>
+    </div></td>
+    <td><div align="center">
+      <input name="P0101B_voltage" type="text" id="P0101B_voltage" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0101B_ia" type="text" id="P0101B_ia" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0101B_ib" type="text" id="P0101B_ib" size="7" maxlength="4" />
+    </div></td>
+    <td><div align="center">
+      <input name="P0101B_ic" type="text" id="P0101B_ic" size="7" maxlength="4" />
+    </div></td>
+  </tr>
+  <tr>
+    <td height="24" colspan="2"><div align="center">备注</div></td>
+    <td colspan="4"><div align="center">
+      <textarea name="f2_pmm_des" cols="40" rows="5" id="f2_pmm_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="568" border="1"  align="center">
+  <tr>
+    <td height="13" colspan="4"><div align="center">2楼机房环境</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">位置</div></td>
+    <td colspan="3"><div align="center">状态</div></td>
+  </tr>
+  <tr>
+    <td width="251"><div align="center">消防主机状态</div></td>
+    <td colspan="3"><div align="center">
+      <select name="f2_fire_host" size="1" id="f2_fire_host">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">消防钢瓶</div></td>
+    <td colspan="3"><div align="center">
+      <select name="f2_fire_bottle" size="1" id="f2_fire_bottle">
+        <option value="0">正压</option>
+        <option value="1">负压</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">温感烟感运行状态</div></td>
+    <td colspan="3"><div align="center">
+      <select name="f2_fire_sensor" size="1" id="f2_fire_sensor">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">消防通道</div></td>
+    <td colspan="3"><div align="center">
+      <select name="f2_fire_access" size="1" id="f2_fire_access">
+        <option value="0">通畅</option>
+        <option value="1">阻塞</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">消防指示牌</div></td>
+    <td colspan="3"><div align="center">
+      <select name="f2_fire_sign" size="1" id="f2_fire_sign">
+        <option value="0">清晰</option>
+        <option value="1">模糊</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">消防声光报警</div></td>
+    <td colspan="3"><div align="center">
+      <select name="f2_fire_alarm" size="1" id="f2_fire_alarm">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">新风机状态</div></td>
+    <td colspan="3"><div align="center">
+      <select name="f2_jxc_state" size="1" id="f2_jxc_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">新风机开启状态</div></td>
+    <td colspan="3"><div align="center">
+      <select name="f2_jxc_open" size="1" id="f2_jxc_open">
+        <option value="0">开启</option>
+        <option value="1">关闭</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">空调漏水绳</div></td>
+    <td colspan="3"><div align="center">
+      <input name="f2_leak_ac" type="radio" onclick="f2_leak_ac_close()" value="0" checked="checked"/> 正常
+      <input type="radio" name="f2_leak_ac" value="1" onclick="f2_leak_ac_open()"/> 
+      漏水 漏点
+      <input name="f2_leak_ac_spot" type="text" disabled="disabled" id="f2_leak_ac_spot" size="8" maxlength="3" />
+    m</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">走廊漏水绳</div></td>
+    <td width="301" colspan="3"><div align="center">
+      <input name="f2_leak_corridor" type="radio" onclick="f2_leak_corridor_close()" value="0" checked="checked"/>
+      正常
+      <input type="radio" name="f2_leak_corridor" value="1" onclick="f2_leak_corridor_open()"/>
+      漏水 漏点
+      <input name="f2_leak_corridor_spot" type="text" disabled="disabled" id="f2_leak_corridor_spot" size="8" maxlength="3" />
+    m</div></td>
+  </tr>
+  <tr>
+    <td><div align="center">大屏幕</div></td>
+    <td colspan="3"><div align="center">
+      <select name="screen_state" size="1" id="screen_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">动环</div></td>
+    <td colspan="3"><div align="center">
+      <select name="observer_state" size="1" id="observer_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">入侵</div></td>
+    <td colspan="3"><div align="center">
+      <select name="f2_defend_state" size="1" id="f2_defend_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">痕迹</div></td>
+    <td colspan="3"><div align="center">
+      <select name="f2_trace_state" size="1" id="f2_trace_state">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">监控室门</div></td>
+    <td colspan="3"><div align="center">
+      <select name="monitorroom_door" size="1" id="monitorroom_door">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">测试间门</div></td>
+    <td colspan="3"><div align="center">
+      <select name="testroom_door" size="1" id="testroom_door">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">机房大门</div></td>
+    <td colspan="3"><div align="center">
+      <select name="gate_door" size="1" id="gate_door">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">钢瓶间门</div></td>
+    <td colspan="3"><div align="center">
+      <select name="bottleroom_door" size="1" id="bottleroom_door">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td><div align="center">楼梯门口</div></td>
+    <td colspan="3"><div align="center">
+      <select name="floor_door" size="1" id="floor_door">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">玻璃门1</div></td>
+    <td colspan="3"><div align="center">
+      <select name="glass_door1" size="1" id="glass_door1">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">玻璃门2</div></td>
+    <td colspan="3"><div align="center">
+      <select name="glass_door2" size="1" id="glass_door2">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">玻璃门3</div></td>
+    <td colspan="3"><div align="center">
+      <select name="glass_door3" size="1" id="glass_door3">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">玻璃门4</div></td>
+    <td colspan="3"><div align="center">
+      <select name="glass_door4" size="1" id="glass_door4">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">机柜门锁门情况</div></td>
+    <td colspan="3"><div align="center">
+      <select name="rack_door" size="1" id="rack_door">
+        <option value="0">正常</option>
+        <option value="1">异常</option>
+        </select>
+    </div></td>
+  </tr>
+  <tr>
+    <td height="28"><div align="center">备注</div></td>
+    <td colspan="3"><div align="center">
+      <textarea name="f2_environment_des" cols="40" rows="5" id="f2_environment_des"></textarea>
+    </div></td>
+  </tr>
+</table>
+</br>
+<table width="515" border="0"  align="center">
+  <tr>
+    <td width="241">&nbsp;</td>
+    <td width="80"><input type="submit" name="f2_comprehensive_submit_button" id="f2_comprehensive_submit_button" value="保存" /></td>
+    <td width="92"><input type="button" value="下一步" onclick="next_step()"></td>
+    <td width="84"><input type="button" value="退出" onclick="cancel_quit()"></td>
+  </tr>
+</table>
+</form>
+</body>
+</html>
